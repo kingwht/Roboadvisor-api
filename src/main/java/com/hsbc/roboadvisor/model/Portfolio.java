@@ -9,7 +9,12 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.DecimalMax;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Entity
+@Getter @Setter @NoArgsConstructor
 @Table(name = "portfolios")
 public class Portfolio {
 
@@ -22,37 +27,9 @@ public class Portfolio {
     @Enumerated(EnumType.STRING)
     private PortfolioType portfolioType;
 
-    public Portfolio() {
-        // empty constructor
-    }
-
     public Portfolio(String portfolioId, BigDecimal deviation, PortfolioType portfolioType) {
         this.portfolioId = portfolioId;
         this.deviation = deviation;
-        this.portfolioType = portfolioType;
-    }
-
-    public String getId() {
-        return this.portfolioId;
-    }
-
-    public void setId(String portfolioId) {
-        this.portfolioId = portfolioId;
-    }
-
-    public BigDecimal getDeviation() {
-        return this.deviation;
-    }
-
-    public void setDeviation(BigDecimal deviation) {
-        this.deviation = deviation;
-    }
-
-    public PortfolioType getPortfolioType() {
-        return this.portfolioType;
-    }
-
-    public void setPortfolioType(PortfolioType portfolioType) {
         this.portfolioType = portfolioType;
     }
 

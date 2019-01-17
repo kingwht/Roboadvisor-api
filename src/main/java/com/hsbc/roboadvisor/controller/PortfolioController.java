@@ -1,13 +1,7 @@
 package com.hsbc.roboadvisor.controller;
 
 import java.net.URI;
-
 import javax.validation.Valid;
-
-import com.hsbc.roboadvisor.exception.ResourceNotFoundException;
-import com.hsbc.roboadvisor.model.Portfolio;
-import com.hsbc.roboadvisor.payload.PortfolioRequest;
-import com.hsbc.roboadvisor.repository.PortfolioRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +15,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import com.hsbc.roboadvisor.exception.ResourceNotFoundException;
+import com.hsbc.roboadvisor.model.Portfolio;
+import com.hsbc.roboadvisor.payload.PortfolioRequest;
+import com.hsbc.roboadvisor.repository.PortfolioRepository;
 
 @RestController
 @RequestMapping("/roboadvisor")
@@ -60,7 +59,7 @@ public class PortfolioController {
             Portfolio portfolio = new Portfolio(id, portfolioRequest.getDeviation(), portfolioRequest.getPortfolioType());
             Portfolio result = portfolioRepository.save(portfolio);
             URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/roboadvisor/{id}")
-                .buildAndExpand(result.getId()).toUri();
+                .buildAndExpand(result.getPortfolioId()).toUri();
             return ResponseEntity.created(location).body(result);
     }
 

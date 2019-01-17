@@ -1,5 +1,9 @@
 package com.hsbc.roboadvisor.payload;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter @Setter
 public class ApiResponse {
     private Boolean success;
     private String message;
@@ -9,19 +13,4 @@ public class ApiResponse {
         this.message = message;
     }
 
-    public Boolean getSuccess() {
-        return success;
-    }
-
-    public void setSuccess(Boolean success) {
-        this.success = success;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }
