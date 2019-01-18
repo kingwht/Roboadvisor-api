@@ -19,7 +19,7 @@ import lombok.Setter;
 public class Portfolio {
 
     @Id
-    private String portfolioId;
+    private int portfolioId;
 
     @DecimalMax("10.00")
     private BigDecimal deviation;
@@ -27,7 +27,7 @@ public class Portfolio {
     @Enumerated(EnumType.STRING)
     private PortfolioType portfolioType;
 
-    public Portfolio(String portfolioId, BigDecimal deviation, PortfolioType portfolioType) {
+    public Portfolio(int portfolioId, BigDecimal deviation, PortfolioType portfolioType) {
         this.portfolioId = portfolioId;
         this.deviation = deviation;
         this.portfolioType = portfolioType;
