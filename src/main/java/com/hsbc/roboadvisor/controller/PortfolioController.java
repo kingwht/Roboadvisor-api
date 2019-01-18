@@ -49,7 +49,7 @@ public class PortfolioController {
     
     @PostMapping("/{id}")
     public ResponseEntity<?> createPortfolio(
-        @PathVariable String id,
+        @PathVariable int id,
         @Valid @RequestBody PortfolioRequest portfolioRequest) {
         
             _logger.info("Request to create portfolio with id: {}", id);
