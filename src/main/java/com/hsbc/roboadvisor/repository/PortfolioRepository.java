@@ -8,8 +8,8 @@ import com.hsbc.roboadvisor.model.Portfolio;
 @Repository
 public interface PortfolioRepository extends JpaRepository<Portfolio, String> {
 
-    Portfolio findByPortfolioId(String portfolioId);
+    Portfolio findByPortfolioId(Long portfolioId);
 
-    Boolean existsByPortfolioId(int portfolioId);
+    Boolean existsByPortfolioId(Long portfolioId);
     
 }
