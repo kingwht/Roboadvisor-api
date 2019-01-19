@@ -1,25 +1,34 @@
 package com.hsbc.roboadvisor.payload;
 
-import java.math.BigDecimal;
-
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 import com.hsbc.roboadvisor.model.PortfolioType;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter @Setter
 public class PortfolioRequest {
 
-    @DecimalMax("10.00")
-    @DecimalMin("0.00")
-    private BigDecimal deviation;
+    @Max(10) @Min(0)
+    private Integer deviation;
 
     @Enumerated(EnumType.STRING)
     private PortfolioType portfolioType;
+
+    public Integer getDeviation(){
+        return this.deviation;
+    }
+
+    public void setDeviation(Integer deviation){
+        this.deviation = deviation;
+    }
+
+    public PortfolioType getPortfolioType(){
+        return this.portfolioType;
+    }
+
+    public void setPortfolioType(PortfolioType portfolioType){
+        this.portfolioType = portfolioType;
+    }
 
 }

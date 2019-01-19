@@ -22,7 +22,7 @@ import com.hsbc.roboadvisor.payload.PortfolioRequest;
 import com.hsbc.roboadvisor.repository.PortfolioRepository;
 
 @RestController
-@RequestMapping("/roboadvisor")
+@RequestMapping("/roboadvisor/portfolio")
 public class PortfolioController {
 
     private static final Logger _logger = LoggerFactory.getLogger(PortfolioController.class);
@@ -32,9 +32,9 @@ public class PortfolioController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getPortfolio(
-        @PathVariable String id) {
+        @PathVariable Long id) {
 
-        _logger.info("Get portfolio id: {}", id);
+        _logger.info("Getting portfolio id: {}", id);
         try {
             Portfolio portfolio = portfolioRepository.findByPortfolioId(id);
             if (portfolio == null) {
@@ -49,7 +49,7 @@ public class PortfolioController {
     
     @PostMapping("/{id}")
     public ResponseEntity<?> createPortfolio(
-        @PathVariable int id,
+        @PathVariable Long id,
         @Valid @RequestBody PortfolioRequest portfolioRequest) {
         
             _logger.info("Request to create portfolio with id: {}", id);
