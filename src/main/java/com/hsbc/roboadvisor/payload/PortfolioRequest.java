@@ -2,16 +2,25 @@ package com.hsbc.roboadvisor.payload;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.Range;
 
 import com.hsbc.roboadvisor.model.PortfolioType;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(description = "Portfolio Preference Creation Request")
 public class PortfolioRequest {
 
-    @Max(10) @Min(0)
+    @ApiModelProperty(required = true, value = "Acceptable Preference Deviation, must be between 0-5%")
+    @Range(min = 0, max = 5)
+    @NotNull(message = "Deviation may not be empty")
     private Integer deviation;
 
+    @ApiModelProperty(required = true, value = "Portfolio Type", allowableValues = "FUND, CATEGORY")
+    @NotNull
     @Enumerated(EnumType.STRING)
     private PortfolioType portfolioType;
 

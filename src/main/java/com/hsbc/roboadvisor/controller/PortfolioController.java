@@ -1,6 +1,7 @@
 package com.hsbc.roboadvisor.controller;
 
 import java.net.URI;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -16,11 +17,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.hsbc.roboadvisor.exception.MissingHeaderException;
 import com.hsbc.roboadvisor.exception.ResourceNotFoundException;
 import com.hsbc.roboadvisor.model.Portfolio;
 import com.hsbc.roboadvisor.payload.PortfolioRequest;
-import com.hsbc.roboadvisor.repository.PortfolioRepository;
+import com.hsbc.roboadvisor.service.PortfolioRepositoryService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import springfox.documentation.annotations.ApiIgnore;
+
+@Api(value = "Portfolio API")
 @RestController
 @RequestMapping("/roboadvisor/portfolio")
 public class PortfolioController {
@@ -28,39 +38,61 @@ public class PortfolioController {
     private static final Logger _logger = LoggerFactory.getLogger(PortfolioController.class);
 
     @Autowired
-    PortfolioRepository portfolioRepository;
+    private PortfolioRepositoryService portfolioService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getPortfolio(
-        @PathVariable Long id) {
+    @ApiOperation(value = "Get portfolio asset allocation and deviation preference.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved portfolio preference.", response = Portfolio.class),
+            @ApiResponse(code = 400, message = "Invalid Portfolio ID."),
+            @ApiResponse(code = 404, message = "No portfolio preference found.")
+    })
+    @GetMapping("/{portfolioId}")
+    public ResponseEntity<?> getPortfolioPreference(
+        @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
+        @ApiIgnore HttpServletRequest httpServletRequest) {
 
-        _logger.info("Getting portfolio id: {}", id);
-        try {
-            Portfolio portfolio = portfolioRepository.findByPortfolioId(id);
-            if (portfolio == null) {
-                throw new ResourceNotFoundException("Portfolio", "PorfolioId", id);
-            }
-            return new ResponseEntity<>(portfolio, HttpStatus.OK);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(
-                    String.format("%s not found with %s : '%s'", e.getResourceName(), e.getFieldName(), e.getFieldValue()), HttpStatus.NOT_FOUND);
+        String customerId = getCustomerIdOrFail(httpServletRequest);
+
+        _logger.info("Getting portfolio id: {} for customer id: {}", portfolioId, customerId);
+
+        Portfolio portfolio = portfolioService.findPreferenceByPortfolioId(portfolioId);
+        if (portfolio == null) {
+            throw new ResourceNotFoundException("Portfolio", "PortfolioId", portfolioId);
         }
+        return new ResponseEntity<>(portfolio, HttpStatus.OK);
     }
-    
-    @PostMapping("/{id}")
-    public ResponseEntity<?> createPortfolio(
-        @PathVariable Long id,
-        @Valid @RequestBody PortfolioRequest portfolioRequest) {
-        
-            _logger.info("Request to create portfolio with id: {}", id);
-            if (portfolioRepository.existsByPortfolioId(id)) {
-                return new ResponseEntity<>(String.format("Portfolio Id with %s already exists!", id), HttpStatus.BAD_REQUEST);
-            }
-            Portfolio portfolio = new Portfolio(id, portfolioRequest.getDeviation(), portfolioRequest.getPortfolioType());
-            Portfolio result = portfolioRepository.save(portfolio);
-            URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/roboadvisor/{id}")
-                .buildAndExpand(result.getPortfolioId()).toUri();
-            return ResponseEntity.created(location).body(result);
+
+
+    @ApiOperation(value = "Create a portfolio asset allocation and deviation preference.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Successfully created portfolio asset allocation and deviation preferences."),
+            @ApiResponse(code = 400, message = "Invalid post portfolio preference request.")
+    })
+    @PostMapping("/{portfolioId}")
+    public ResponseEntity<?> createPortfolioPreference(
+        @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
+        @Valid @RequestBody PortfolioRequest portfolioRequest,
+        @ApiIgnore HttpServletRequest httpServletRequest) {
+
+        String customerId = getCustomerIdOrFail(httpServletRequest);
+
+        _logger.info("Request to create portfolio with id: {} for customer id: {}", portfolioId, customerId);
+
+        Portfolio result = portfolioService.savePreference(portfolioId, portfolioRequest);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/roboadvisor/{id}")
+            .buildAndExpand(result.getPortfolioId()).toUri();
+
+        return ResponseEntity.created(location).body(result);
+    }
+
+    private String getCustomerIdOrFail(HttpServletRequest httpServletRequest)
+    {
+        String customerId = httpServletRequest.getHeader("x-custid");
+        if (customerId == null) {
+            throw new MissingHeaderException("Missing x-custid header!");
+        }
+        return customerId;
     }
 
 }
