@@ -1,41 +1,51 @@
 package com.hsbc.roboadvisor.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.Range;
 
 @Entity
-@Table(name = "portfolios")
+@Table(name = "portfolio")
 public class Portfolio {
 
     @Id
-    private Long portfolioId;
+    @Range(min = 0)
+    @Column(name = "portfolio_id")
+    private Integer portfolioId;
 
-    @Max(10) @Min(0)
+    @NotNull
+    @Column(name = "deviation")
+    @Range(min = 0, max = 5)
     private Integer deviation;
 
+    @NotNull
+    @Column(name = "portfolio_type")
     @Enumerated(EnumType.STRING)
     private PortfolioType portfolioType;
+
+    //TODO: Allocations
 
     public Portfolio(){
         //empty constructor
     }
 
-    public Portfolio(Long portfolioId, Integer deviation, PortfolioType portfolioType) {
+    public Portfolio(Integer portfolioId, Integer deviation, PortfolioType portfolioType) {
         this.portfolioId = portfolioId;
         this.deviation = deviation;
         this.portfolioType = portfolioType;
     }
 
-    public Long getPortfolioId(){
+    public Integer getPortfolioId(){
         return this.portfolioId;
     }
 
-    public void setPortfolioId(Long portfolioId){
+    public void setPortfolioId(Integer portfolioId){
         this.portfolioId = portfolioId;
     }
 
