@@ -24,6 +24,15 @@ public class PortfolioRequest {
     @Enumerated(EnumType.STRING)
     private PortfolioType portfolioType;
 
+    public PortfolioRequest() {
+        //empty constructor
+    }
+
+    public PortfolioRequest(Integer deviation, PortfolioType portfolioType) {
+        this.deviation = deviation;
+        this.portfolioType = portfolioType;
+    }
+
     public Integer getDeviation(){
         return this.deviation;
     }
