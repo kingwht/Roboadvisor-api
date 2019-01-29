@@ -1,6 +1,8 @@
 package com.hsbc.roboadvisor.controller;
 
 import java.net.URI;
+import java.util.Collections;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +23,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.hsbc.roboadvisor.exception.MissingHeaderException;
 import com.hsbc.roboadvisor.exception.ResourceNotFoundException;
 import com.hsbc.roboadvisor.model.Portfolio;
+import com.hsbc.roboadvisor.payload.DeviationRequest;
 import com.hsbc.roboadvisor.payload.PortfolioRequest;
 import com.hsbc.roboadvisor.service.PortfolioRepositoryService;
 
@@ -84,6 +88,31 @@ public class PortfolioController {
             .buildAndExpand(result.getPortfolioId()).toUri();
 
         return ResponseEntity.created(location).body(result);
+    }
+
+    @ApiOperation(value = "Update a portfolio deviation percentage.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully updated the portfolio's deviation."),
+            @ApiResponse(code = 404, message = "Invalid Portfolio ID.")
+    })
+    @PutMapping("/{portfolioId}/deviation")
+    public ResponseEntity<?> setPortfolioDeviation(
+        @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
+        @Valid @RequestBody DeviationRequest deviationRequest,
+        @ApiIgnore HttpServletRequest httpServletRequest) {
+
+        String customerId = getCustomerIdOrFail(httpServletRequest);
+
+        _logger.info("Request to update portfolio deviation with id: {} for customer id: {}", portfolioId, customerId);
+
+        Boolean portfolioExists = this.portfolioService.preferenceExistsByPortfolioId(portfolioId);
+        if (!portfolioExists) {
+            throw new ResourceNotFoundException("Portfolio", "PortfolioId", portfolioId);
+        }
+
+        Portfolio result = this.portfolioService.updateDeviationByPortfolioId(portfolioId, deviationRequest);
+        Map<String, Integer> body = Collections.singletonMap("deviation", result.getDeviation());
+        return ResponseEntity.ok(body);
     }
 
     private String getCustomerIdOrFail(HttpServletRequest httpServletRequest)
