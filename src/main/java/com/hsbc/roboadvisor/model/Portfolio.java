@@ -1,6 +1,8 @@
 package com.hsbc.roboadvisor.model;
 
+import java.util.List;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -9,6 +11,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Range;
+
+import com.hsbc.roboadvisor.service.JpaJsonConverter;
 
 @Entity
 @Table(name = "portfolio")
@@ -29,16 +33,20 @@ public class Portfolio {
     @Enumerated(EnumType.STRING)
     private PortfolioType portfolioType;
 
-    //TODO: Allocations
+    @NotNull
+    @Column(name = "allocations")
+    @Convert(converter = JpaJsonConverter.class)
+    private List<Allocation> allocations;
 
     public Portfolio(){
         //empty constructor
     }
 
-    public Portfolio(Integer portfolioId, Integer deviation, PortfolioType portfolioType) {
+    public Portfolio(Integer portfolioId, Integer deviation, PortfolioType portfolioType, List<Allocation> allocations) {
         this.portfolioId = portfolioId;
         this.deviation = deviation;
         this.portfolioType = portfolioType;
+        this.allocations = allocations;
     }
 
     public Integer getPortfolioId(){
@@ -65,4 +73,11 @@ public class Portfolio {
         this.portfolioType = portfolioType;
     }
 
+    public List<Allocation> getAllocations() {
+        return this.allocations;
+    }
+
+    public void setAllocations(List<Allocation> allocations) {
+        this.allocations = allocations;
+    }
 }

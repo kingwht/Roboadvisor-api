@@ -1,3 +1,6 @@
+CREATE DATABASE IF NOT EXISTS roboadvisor;
+USE roboadvisor;
+
 CREATE TABLE portfolio (
     portfolio_id INTEGER(20) NOT NULL UNIQUE,
     deviation INTEGER(20) NOT NULL,

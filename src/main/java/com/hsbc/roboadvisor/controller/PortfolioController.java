@@ -3,7 +3,6 @@ package com.hsbc.roboadvisor.controller;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -16,13 +15,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.hsbc.roboadvisor.exception.MissingHeaderException;
+import com.hsbc.roboadvisor.exception.BadRequestException;
 import com.hsbc.roboadvisor.exception.ResourceNotFoundException;
+import com.hsbc.roboadvisor.model.Allocation;
 import com.hsbc.roboadvisor.model.Portfolio;
+import com.hsbc.roboadvisor.model.PortfolioType;
 import com.hsbc.roboadvisor.payload.DeviationRequest;
 import com.hsbc.roboadvisor.payload.PortfolioRequest;
 import com.hsbc.roboadvisor.service.PortfolioRepositoryService;
@@ -32,7 +34,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import springfox.documentation.annotations.ApiIgnore;
 
 @Api(value = "Portfolio API")
 @RestController
@@ -52,10 +53,8 @@ public class PortfolioController {
     })
     @GetMapping("/{portfolioId}")
     public ResponseEntity<?> getPortfolioPreference(
-        @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
-        @ApiIgnore HttpServletRequest httpServletRequest) {
-
-        String customerId = getCustomerIdOrFail(httpServletRequest);
+        @RequestHeader(value = "x-custid") Integer customerId,
+        @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId) {
 
         _logger.info("Getting portfolio id: {} for customer id: {}", portfolioId, customerId);
 
@@ -74,20 +73,31 @@ public class PortfolioController {
     })
     @PostMapping("/{portfolioId}")
     public ResponseEntity<?> createPortfolioPreference(
+        @RequestHeader(value = "x-custid") Integer customerId,
         @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
-        @Valid @RequestBody PortfolioRequest portfolioRequest,
-        @ApiIgnore HttpServletRequest httpServletRequest) {
-
-        String customerId = getCustomerIdOrFail(httpServletRequest);
+        @Valid @RequestBody PortfolioRequest portfolioRequest) {
 
         _logger.info("Request to create portfolio with id: {} for customer id: {}", portfolioId, customerId);
+
+        for (Allocation allocation : portfolioRequest.getAllocations()) {
+            if (portfolioRequest.getPortfolioType().equals(PortfolioType.category) && allocation.getFundId() != null) {
+                throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
+            }else if (portfolioRequest.getPortfolioType().equals(PortfolioType.fund) && allocation.getCategory() != null){
+                throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
+            }
+            if (allocation.getCategory() == null && allocation.getFundId() == null) {
+                throw new BadRequestException("Missing Category or Fund Id. Please check again.");
+            } else if (allocation.getCategory() != null && allocation.getFundId() != null) {
+                throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
+            }
+        }
 
         Portfolio result = portfolioService.savePreference(portfolioId, portfolioRequest);
 
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/roboadvisor/{id}")
             .buildAndExpand(result.getPortfolioId()).toUri();
 
-        return ResponseEntity.created(location).body(result);
+        return ResponseEntity.created(location).build();
     }
 
     @ApiOperation(value = "Update a portfolio deviation percentage.")
@@ -97,11 +107,9 @@ public class PortfolioController {
     })
     @PutMapping("/{portfolioId}/deviation")
     public ResponseEntity<?> setPortfolioDeviation(
+        @RequestHeader(value = "x-custid") Integer customerId,
         @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
-        @Valid @RequestBody DeviationRequest deviationRequest,
-        @ApiIgnore HttpServletRequest httpServletRequest) {
-
-        String customerId = getCustomerIdOrFail(httpServletRequest);
+        @Valid @RequestBody DeviationRequest deviationRequest) {
 
         _logger.info("Request to update portfolio deviation with id: {} for customer id: {}", portfolioId, customerId);
 
@@ -113,15 +121,6 @@ public class PortfolioController {
         Portfolio result = this.portfolioService.updateDeviationByPortfolioId(portfolioId, deviationRequest);
         Map<String, Integer> body = Collections.singletonMap("deviation", result.getDeviation());
         return ResponseEntity.ok(body);
-    }
-
-    private String getCustomerIdOrFail(HttpServletRequest httpServletRequest)
-    {
-        String customerId = httpServletRequest.getHeader("x-custid");
-        if (customerId == null) {
-            throw new MissingHeaderException("Missing x-custid header!");
-        }
-        return customerId;
     }
 
 }

@@ -1,11 +1,13 @@
 package com.hsbc.roboadvisor.payload;
 
+import java.util.List;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Range;
 
+import com.hsbc.roboadvisor.model.Allocation;
 import com.hsbc.roboadvisor.model.PortfolioType;
 
 import io.swagger.annotations.ApiModel;
@@ -19,10 +21,14 @@ public class PortfolioRequest {
     @NotNull(message = "Deviation may not be empty")
     private Integer deviation;
 
-    @ApiModelProperty(required = true, value = "Portfolio Type", allowableValues = "FUND, CATEGORY")
+    @ApiModelProperty(required = true, value = "Portfolio Type", allowableValues = "fund, category")
     @NotNull
     @Enumerated(EnumType.STRING)
     private PortfolioType portfolioType;
+
+    @ApiModelProperty(required = true, value = "Asset Allocations")
+    @NotNull
+    private List<Allocation> allocations;
 
     public PortfolioRequest() {
         //empty constructor
@@ -49,4 +55,11 @@ public class PortfolioRequest {
         this.portfolioType = portfolioType;
     }
 
+    public List<Allocation> getAllocations() {
+        return this.allocations;
+    }
+
+    public void setAllocations(List<Allocation> allocations) {
+        this.allocations = allocations;
+    }
 }
