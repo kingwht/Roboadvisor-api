@@ -2,6 +2,7 @@ package com.hsbc.roboadvisor.controller;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import javax.validation.Valid;
 
@@ -25,6 +26,7 @@ import com.hsbc.roboadvisor.exception.ResourceNotFoundException;
 import com.hsbc.roboadvisor.model.Allocation;
 import com.hsbc.roboadvisor.model.Portfolio;
 import com.hsbc.roboadvisor.model.PortfolioType;
+import com.hsbc.roboadvisor.payload.AllocationsRequest;
 import com.hsbc.roboadvisor.payload.DeviationRequest;
 import com.hsbc.roboadvisor.payload.PortfolioRequest;
 import com.hsbc.roboadvisor.service.PortfolioRepositoryService;
@@ -77,20 +79,9 @@ public class PortfolioController {
         @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
         @Valid @RequestBody PortfolioRequest portfolioRequest) {
 
-        _logger.info("Request to create portfolio with id: {} for customer id: {}", portfolioId, customerId);
+        _logger.info("Request to create portfolio with portfolio id: {} for customer id: {}", portfolioId, customerId);
 
-        for (Allocation allocation : portfolioRequest.getAllocations()) {
-            if (portfolioRequest.getPortfolioType().equals(PortfolioType.category) && allocation.getFundId() != null) {
-                throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
-            }else if (portfolioRequest.getPortfolioType().equals(PortfolioType.fund) && allocation.getCategory() != null){
-                throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
-            }
-            if (allocation.getCategory() == null && allocation.getFundId() == null) {
-                throw new BadRequestException("Missing Category or Fund Id. Please check again.");
-            } else if (allocation.getCategory() != null && allocation.getFundId() != null) {
-                throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
-            }
-        }
+        allocationListValidOrFail(portfolioRequest.getAllocations(), portfolioRequest.getPortfolioType());
 
         Portfolio result = portfolioService.savePreference(portfolioId, portfolioRequest);
 
@@ -100,6 +91,30 @@ public class PortfolioController {
         return ResponseEntity.created(location).build();
     }
 
+    @ApiOperation(value = "Update a portfolio preference allocation.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully updated the portfolio's preferred allocations."),
+            @ApiResponse(code = 404, message = "Invalid Portfolio ID.")
+    })
+    @PutMapping("/{portfolioId}/allocations")
+    public ResponseEntity<?> setPortfolioAllocation(
+            @RequestHeader(value = "x-custid") Integer customerId,
+            @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
+            @Valid @RequestBody AllocationsRequest allocationsRequest) {
+
+        _logger.info("Request to update portfolio allocations with portfolio id: {} for customer id: {}", portfolioId, customerId);
+
+        Portfolio portfolio = portfolioService.findPreferenceByPortfolioId(portfolioId);
+        if (portfolio == null) {
+            throw new ResourceNotFoundException("Portfolio", "PortfolioId", portfolioId);
+        }
+
+        allocationListValidOrFail(allocationsRequest.getAllocations(), portfolio.getPortfolioType());
+
+        this.portfolioService.updateAllocationsByPortfolioId(portfolioId, allocationsRequest.getAllocations());
+        return ResponseEntity.ok(allocationsRequest.getAllocations());
+    }
+
     @ApiOperation(value = "Update a portfolio deviation percentage.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully updated the portfolio's deviation."),
@@ -107,11 +122,11 @@ public class PortfolioController {
     })
     @PutMapping("/{portfolioId}/deviation")
     public ResponseEntity<?> setPortfolioDeviation(
-        @RequestHeader(value = "x-custid") Integer customerId,
+            @RequestHeader(value = "x-custid") Integer customerId,
         @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
         @Valid @RequestBody DeviationRequest deviationRequest) {
 
-        _logger.info("Request to update portfolio deviation with id: {} for customer id: {}", portfolioId, customerId);
+        _logger.info("Request to update portfolio deviation with portfolio id: {} for customer id: {}", portfolioId, customerId);
 
         Boolean portfolioExists = this.portfolioService.preferenceExistsByPortfolioId(portfolioId);
         if (!portfolioExists) {
@@ -123,4 +138,20 @@ public class PortfolioController {
         return ResponseEntity.ok(body);
     }
 
+    private void allocationListValidOrFail(List<Allocation> allocationList, PortfolioType portfolioType)
+    {
+        for (Allocation allocation : allocationList) {
+            if (portfolioType.equals(PortfolioType.category) && allocation.getFundId() != null) {
+                throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
+            }else if (portfolioType.equals(PortfolioType.fund) && allocation.getCategory() != null){
+                throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
+            }
+            
+            if (allocation.getCategory() == null && allocation.getFundId() == null) {
+                throw new BadRequestException("Missing Category or Fund Id. Please check again.");
+            } else if (allocation.getCategory() != null && allocation.getFundId() != null) {
+                throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
+            }
+        }
+    }
 }
