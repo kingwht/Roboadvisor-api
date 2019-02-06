@@ -4,9 +4,12 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Range;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @ApiModel(description = "Update Portfolio Deviation Request")
 public class DeviationRequest
 {

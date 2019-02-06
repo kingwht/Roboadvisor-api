@@ -12,10 +12,12 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Range;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.hsbc.roboadvisor.service.JpaJsonConverter;
 
 @Entity
 @Table(name = "portfolio")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Portfolio {
 
     @Id

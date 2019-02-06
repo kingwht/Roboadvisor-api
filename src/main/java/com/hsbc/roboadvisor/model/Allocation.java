@@ -4,9 +4,12 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @ApiModel(description = "Allocation object which includes an asset and a preferred target percentage.")
 public class Allocation implements Serializable
 {

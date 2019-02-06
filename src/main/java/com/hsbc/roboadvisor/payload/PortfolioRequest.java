@@ -7,12 +7,14 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Range;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.hsbc.roboadvisor.model.Allocation;
 import com.hsbc.roboadvisor.model.PortfolioType;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @ApiModel(description = "Portfolio Preference Creation Request")
 public class PortfolioRequest {
 
