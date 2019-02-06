@@ -33,7 +33,7 @@ public class PortfolioRepositoryService
             totalPercent = totalPercent.add(allocation.getPercentage());
         }
 
-        if (totalPercent.compareTo(new BigDecimal(100)) == 0) {
+        if (totalPercent.compareTo(new BigDecimal(100)) != 0) {
             throw new BadRequestException("Total percentage must be 100%. Please check again.");
         }
 
