@@ -18,3 +18,6 @@ Build with unit test only:
 
 ## Running RoboAdvisor Jar
 `java -jar target/<roboadvisor jar>.jar`
+
+## Checking Swagger
+Once the service/jar is running, the swagger page can be reached at `localhost:5000/swagger-ui.html`
