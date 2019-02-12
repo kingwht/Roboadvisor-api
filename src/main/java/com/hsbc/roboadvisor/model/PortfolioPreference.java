@@ -15,10 +15,13 @@ import org.hibernate.validator.constraints.Range;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.hsbc.roboadvisor.service.JpaJsonConverter;
 
+import io.swagger.annotations.ApiModel;
+
 @Entity
 @Table(name = "portfolio")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Portfolio {
+@ApiModel(description = "Portfolio Preference Object")
+public class PortfolioPreference {
 
     @Id
     @Range(min = 0)
@@ -40,11 +43,11 @@ public class Portfolio {
     @Convert(converter = JpaJsonConverter.class)
     private List<Allocation> allocations;
 
-    public Portfolio(){
+    public PortfolioPreference(){
         //empty constructor
     }
 
-    public Portfolio(Integer portfolioId, Integer deviation, PortfolioType portfolioType, List<Allocation> allocations) {
+    public PortfolioPreference(Integer portfolioId, Integer deviation, PortfolioType portfolioType, List<Allocation> allocations) {
         this.portfolioId = portfolioId;
         this.deviation = deviation;
         this.portfolioType = portfolioType;

@@ -10,7 +10,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@ApiModel(description = "Update Portfolio Allocations")
+@ApiModel(description = "Update Portfolio Preference Allocations")
 public class AllocationsRequest
 {
     @ApiModelProperty(required = true, value = "List of Allocations. Sum of percentage must total 100%.")

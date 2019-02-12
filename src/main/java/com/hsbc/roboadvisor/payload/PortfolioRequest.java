@@ -15,7 +15,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@ApiModel(description = "Portfolio Preference Creation Request")
+@ApiModel(description = "PortfolioPreference Preference Creation Request")
 public class PortfolioRequest {
 
     @ApiModelProperty(required = true, value = "Acceptable Preference Deviation, must be between 0-5%")
@@ -23,7 +23,7 @@ public class PortfolioRequest {
     @NotNull(message = "Deviation may not be empty")
     private Integer deviation;
 
-    @ApiModelProperty(required = true, value = "Portfolio Type", allowableValues = "fund, category")
+    @ApiModelProperty(required = true, value = "PortfolioPreference Type", allowableValues = "fund, category")
     @NotNull
     @Enumerated(EnumType.STRING)
     private PortfolioType portfolioType;
