@@ -24,12 +24,15 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.hsbc.roboadvisor.exception.BadRequestException;
 import com.hsbc.roboadvisor.exception.ResourceNotFoundException;
 import com.hsbc.roboadvisor.model.Allocation;
-import com.hsbc.roboadvisor.model.Portfolio;
+import com.hsbc.roboadvisor.model.PortfolioPreference;
 import com.hsbc.roboadvisor.model.PortfolioType;
+import com.hsbc.roboadvisor.model.Recommendation;
 import com.hsbc.roboadvisor.payload.AllocationsRequest;
 import com.hsbc.roboadvisor.payload.DeviationRequest;
 import com.hsbc.roboadvisor.payload.PortfolioRequest;
+import com.hsbc.roboadvisor.payload.TransactionsRequest;
 import com.hsbc.roboadvisor.service.PortfolioRepositoryService;
+import com.hsbc.roboadvisor.service.RecommendationRepositoryService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -37,7 +40,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-@Api(value = "Portfolio API")
+@Api(value = "Portfolio Preference API")
 @RestController
 @RequestMapping("/roboadvisor/portfolio")
 public class PortfolioController {
@@ -47,9 +50,12 @@ public class PortfolioController {
     @Autowired
     private PortfolioRepositoryService portfolioService;
 
+    @Autowired
+    private RecommendationRepositoryService recommendationRepositoryService;
+
     @ApiOperation(value = "Get portfolio asset allocation and deviation preference.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully retrieved portfolio preference.", response = Portfolio.class),
+            @ApiResponse(code = 200, message = "Successfully retrieved portfolio preference.", response = PortfolioPreference.class),
             @ApiResponse(code = 400, message = "Invalid Portfolio ID."),
             @ApiResponse(code = 404, message = "No portfolio preference found.")
     })
@@ -60,7 +66,7 @@ public class PortfolioController {
 
         _logger.info("Getting portfolio id: {} for customer id: {}", portfolioId, customerId);
 
-        Portfolio portfolio = portfolioService.findPreferenceByPortfolioId(portfolioId);
+        PortfolioPreference portfolio = portfolioService.findPreferenceByPortfolioId(portfolioId);
         if (portfolio == null) {
             throw new ResourceNotFoundException("Portfolio", "PortfolioId", portfolioId);
         }
@@ -83,7 +89,7 @@ public class PortfolioController {
 
         allocationListValidOrFail(portfolioRequest.getAllocations(), portfolioRequest.getPortfolioType());
 
-        Portfolio result = portfolioService.savePreference(portfolioId, portfolioRequest);
+        PortfolioPreference result = portfolioService.savePreference(portfolioId, portfolioRequest);
 
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/roboadvisor/{id}")
             .buildAndExpand(result.getPortfolioId()).toUri();
@@ -104,7 +110,7 @@ public class PortfolioController {
 
         _logger.info("Request to update portfolio allocations with portfolio id: {} for customer id: {}", portfolioId, customerId);
 
-        Portfolio portfolio = portfolioService.findPreferenceByPortfolioId(portfolioId);
+        PortfolioPreference portfolio = portfolioService.findPreferenceByPortfolioId(portfolioId);
         if (portfolio == null) {
             throw new ResourceNotFoundException("Portfolio", "PortfolioId", portfolioId);
         }
@@ -123,8 +129,8 @@ public class PortfolioController {
     @PutMapping("/{portfolioId}/deviation")
     public ResponseEntity<?> setPortfolioDeviation(
             @RequestHeader(value = "x-custid") Integer customerId,
-        @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
-        @Valid @RequestBody DeviationRequest deviationRequest) {
+            @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
+            @Valid @RequestBody DeviationRequest deviationRequest) {
 
         _logger.info("Request to update portfolio deviation with portfolio id: {} for customer id: {}", portfolioId, customerId);
 
@@ -133,7 +139,7 @@ public class PortfolioController {
             throw new ResourceNotFoundException("Portfolio", "PortfolioId", portfolioId);
         }
 
-        Portfolio result = this.portfolioService.updateDeviationByPortfolioId(portfolioId, deviationRequest);
+        PortfolioPreference result = this.portfolioService.updateDeviationByPortfolioId(portfolioId, deviationRequest);
         Map<String, Integer> body = Collections.singletonMap("deviation", result.getDeviation());
         return ResponseEntity.ok(body);
     }
@@ -153,5 +159,96 @@ public class PortfolioController {
                 throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
             }
         }
+    }
+
+    @ApiOperation(value = "Create a rebalance recommendation.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully created rebalance recommendation."),
+            @ApiResponse(code = 400, message = "Invalid post recommendation preference request.")
+    })
+    @PostMapping("/{portfolioId}/rebalance")
+    public ResponseEntity<?> createRecommendation(
+            @RequestHeader(value = "x-custid") Integer customerId,
+            @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId){
+
+        _logger.info("Request to create recommendation for portfolio id: {} for customer id: {}", portfolioId, customerId);
+
+        PortfolioPreference portfolioPreference = portfolioService.findPreferenceByPortfolioId(portfolioId);
+        if (portfolioPreference == null) {
+            throw new ResourceNotFoundException("Portfolio", "PortfolioId", portfolioId);
+        }
+
+        Object portfolio = null; //TODO: get portfolio from calling /portfolio from Wilson's Api using the customer Id.
+
+        Recommendation recommendation = recommendationRepositoryService.findRecommendationByPortfolioId(portfolioId);
+        if (recommendation != null) {
+            recommendation = this.recommendationRepositoryService.updateRecommendation(recommendation,
+                    portfolio, portfolioPreference);
+        } else {
+            recommendation = this.recommendationRepositoryService.saveRecommendation(portfolio, portfolioPreference);
+        }
+
+        return ResponseEntity.ok(recommendation);
+    }
+
+    @ApiOperation(value = "Execute the rebalance recommendation.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully executed the rebalance recommendation.")
+    })
+    @PostMapping("/{portfolioId}/recommendation/{recommendationId}/execute")
+    public ResponseEntity<?> executeRecommendation(
+            @RequestHeader(value = "x-custid") Integer customerId,
+            @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
+            @ApiParam(value = "Recommendation ID", required = true) @PathVariable Integer recommendationId) {
+
+        _logger.info("Request to execute recommendation for recommendation id: {} for customer id: {}", recommendationId, customerId);
+
+        PortfolioPreference portfolioPreference = portfolioService.findPreferenceByPortfolioId(portfolioId);
+        if (portfolioPreference == null) {
+            throw new ResourceNotFoundException("Portfolio", "PortfolioId", portfolioId);
+        }
+
+        Recommendation recommendation = recommendationRepositoryService.findRecommendationByRecommendationId(recommendationId);
+        if (recommendation == null) {
+            throw new ResourceNotFoundException("Recommendation", "Recommendation Id", recommendationId);
+        }
+
+        try{
+            _logger.info("HERE WOULD BE WHERE YOU EXECUTE THE TRANSACTION");
+            //TODO: EXECUTE TRANSACTION
+        }catch (Exception e) {
+            //TODO: DEAL WITH EXECPTION
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    @ApiOperation(value = "Update the transactions in the rebalance recommendation.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully executed the rebalance recommendation.")
+    })
+    @PutMapping("/{portfolioId}/recommendation/{recommendationId}/modify")
+    public ResponseEntity<?> modifyRecommendation (
+            @RequestHeader(value = "x-custid") Integer customerId,
+            @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
+            @ApiParam(value = "Recommendation ID", required = true) @PathVariable Integer recommendationId,
+            @Valid @RequestBody TransactionsRequest transactionsRequest) {
+
+        _logger.info("Request to update recommendation for recommendation id: {} for customer id: {}", recommendationId, customerId);
+
+        PortfolioPreference portfolioPreference = portfolioService.findPreferenceByPortfolioId(portfolioId);
+        if (portfolioPreference == null) {
+            throw new ResourceNotFoundException("Portfolio", "PortfolioId", portfolioId);
+        }
+
+        Recommendation recommendation = recommendationRepositoryService.findRecommendationByRecommendationId(recommendationId);
+        if (recommendation == null) {
+            throw new ResourceNotFoundException("Recommendation", "Recommendation Id", recommendationId);
+        }
+
+        Recommendation result = this.recommendationRepositoryService.updateRecommendationTransactions(
+                recommendation, transactionsRequest.getTransactionList());
+
+        return ResponseEntity.ok(result);
     }
 }

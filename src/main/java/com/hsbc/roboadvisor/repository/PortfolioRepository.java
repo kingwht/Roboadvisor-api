@@ -3,13 +3,13 @@ package com.hsbc.roboadvisor.repository;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import com.hsbc.roboadvisor.model.Portfolio;
+import com.hsbc.roboadvisor.model.PortfolioPreference;
 
 @Repository
-public interface PortfolioRepository extends CrudRepository<Portfolio, String>
+public interface PortfolioRepository extends CrudRepository<PortfolioPreference, String>
 {
 
-    Portfolio findByPortfolioId(Integer portfolioId);
+    PortfolioPreference findByPortfolioId(Integer portfolioId);
 
     Boolean existsByPortfolioId(Integer portfolioId);
     

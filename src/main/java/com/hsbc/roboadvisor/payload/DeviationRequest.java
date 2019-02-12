@@ -10,7 +10,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@ApiModel(description = "Update Portfolio Deviation Request")
+@ApiModel(description = "Update Portfolio Preference Deviation Request")
 public class DeviationRequest
 {
     @ApiModelProperty(required = true, value = "Acceptable Preference Deviation, must be between 0-5%")

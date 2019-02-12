@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 
 import com.hsbc.roboadvisor.repository.PortfolioRepository;
 
-public class PortfolioControllerTest {
+public class PortfolioPreferenceControllerTest {
 
 	@InjectMocks
 	private PortfolioController portfolioController;
