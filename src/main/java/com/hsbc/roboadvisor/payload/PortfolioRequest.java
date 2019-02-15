@@ -26,7 +26,7 @@ public class PortfolioRequest {
     @ApiModelProperty(required = true, value = "PortfolioPreference Type", allowableValues = "fund, category")
     @NotNull
     @Enumerated(EnumType.STRING)
-    private PortfolioType portfolioType;
+    private PortfolioType type;
 
     @ApiModelProperty(required = true, value = "Asset Allocations")
     @NotNull
@@ -36,9 +36,9 @@ public class PortfolioRequest {
         //empty constructor
     }
 
-    public PortfolioRequest(Integer deviation, PortfolioType portfolioType) {
+    public PortfolioRequest(Integer deviation, PortfolioType type) {
         this.deviation = deviation;
-        this.portfolioType = portfolioType;
+        this.type = type;
     }
 
     public Integer getDeviation(){
@@ -49,12 +49,12 @@ public class PortfolioRequest {
         this.deviation = deviation;
     }
 
-    public PortfolioType getPortfolioType(){
-        return this.portfolioType;
+    public PortfolioType getType(){
+        return this.type;
     }
 
-    public void setPortfolioType(PortfolioType portfolioType){
-        this.portfolioType = portfolioType;
+    public void setType(PortfolioType type){
+        this.type = type;
     }
 
     public List<Allocation> getAllocations() {

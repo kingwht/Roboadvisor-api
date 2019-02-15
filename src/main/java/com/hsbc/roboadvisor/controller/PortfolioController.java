@@ -27,10 +27,9 @@ import com.hsbc.roboadvisor.model.Allocation;
 import com.hsbc.roboadvisor.model.PortfolioPreference;
 import com.hsbc.roboadvisor.model.PortfolioType;
 import com.hsbc.roboadvisor.model.Recommendation;
-import com.hsbc.roboadvisor.payload.AllocationsRequest;
+import com.hsbc.roboadvisor.model.Transaction;
 import com.hsbc.roboadvisor.payload.DeviationRequest;
 import com.hsbc.roboadvisor.payload.PortfolioRequest;
-import com.hsbc.roboadvisor.payload.TransactionsRequest;
 import com.hsbc.roboadvisor.service.PortfolioRepositoryService;
 import com.hsbc.roboadvisor.service.RecommendationRepositoryService;
 
@@ -87,7 +86,7 @@ public class PortfolioController {
 
         _logger.info("Request to create portfolio with portfolio id: {} for customer id: {}", portfolioId, customerId);
 
-        allocationListValidOrFail(portfolioRequest.getAllocations(), portfolioRequest.getPortfolioType());
+        allocationListValidOrFail(portfolioRequest.getAllocations(), portfolioRequest.getType());
 
         PortfolioPreference result = portfolioService.savePreference(portfolioId, portfolioRequest);
 
@@ -106,7 +105,7 @@ public class PortfolioController {
     public ResponseEntity<?> setPortfolioAllocation(
             @RequestHeader(value = "x-custid") Integer customerId,
             @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
-            @Valid @RequestBody AllocationsRequest allocationsRequest) {
+            @Valid @RequestBody  List<Allocation> allocationList) {
 
         _logger.info("Request to update portfolio allocations with portfolio id: {} for customer id: {}", portfolioId, customerId);
 
@@ -115,10 +114,27 @@ public class PortfolioController {
             throw new ResourceNotFoundException("Portfolio", "PortfolioId", portfolioId);
         }
 
-        allocationListValidOrFail(allocationsRequest.getAllocations(), portfolio.getPortfolioType());
+        allocationListValidOrFail(allocationList, portfolio.getPortfolioType());
 
-        this.portfolioService.updateAllocationsByPortfolioId(portfolioId, allocationsRequest.getAllocations());
-        return ResponseEntity.ok(allocationsRequest.getAllocations());
+        this.portfolioService.updateAllocationsByPortfolioId(portfolioId, allocationList);
+        return ResponseEntity.ok(allocationList);
+    }
+
+    private void allocationListValidOrFail(List<Allocation> allocationList, PortfolioType portfolioType)
+    {
+        for (Allocation allocation : allocationList) {
+            if (portfolioType.equals(PortfolioType.category) && allocation.getFundId() != null) {
+                throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
+            }else if (portfolioType.equals(PortfolioType.fund) && allocation.getCategory() != null){
+                throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
+            }
+
+            if (allocation.getCategory() == null && allocation.getFundId() == null) {
+                throw new BadRequestException("Missing Category or Fund Id. Please check again.");
+            } else if (allocation.getCategory() != null && allocation.getFundId() != null) {
+                throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
+            }
+        }
     }
 
     @ApiOperation(value = "Update a portfolio deviation percentage.")
@@ -142,23 +158,6 @@ public class PortfolioController {
         PortfolioPreference result = this.portfolioService.updateDeviationByPortfolioId(portfolioId, deviationRequest);
         Map<String, Integer> body = Collections.singletonMap("deviation", result.getDeviation());
         return ResponseEntity.ok(body);
-    }
-
-    private void allocationListValidOrFail(List<Allocation> allocationList, PortfolioType portfolioType)
-    {
-        for (Allocation allocation : allocationList) {
-            if (portfolioType.equals(PortfolioType.category) && allocation.getFundId() != null) {
-                throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
-            }else if (portfolioType.equals(PortfolioType.fund) && allocation.getCategory() != null){
-                throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
-            }
-            
-            if (allocation.getCategory() == null && allocation.getFundId() == null) {
-                throw new BadRequestException("Missing Category or Fund Id. Please check again.");
-            } else if (allocation.getCategory() != null && allocation.getFundId() != null) {
-                throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
-            }
-        }
     }
 
     @ApiOperation(value = "Create a rebalance recommendation.")
@@ -232,7 +231,7 @@ public class PortfolioController {
             @RequestHeader(value = "x-custid") Integer customerId,
             @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
             @ApiParam(value = "Recommendation ID", required = true) @PathVariable Integer recommendationId,
-            @Valid @RequestBody TransactionsRequest transactionsRequest) {
+            @Valid @RequestBody List<Transaction> transactionList) {
 
         _logger.info("Request to update recommendation for recommendation id: {} for customer id: {}", recommendationId, customerId);
 
@@ -247,7 +246,7 @@ public class PortfolioController {
         }
 
         Recommendation result = this.recommendationRepositoryService.updateRecommendationTransactions(
-                recommendation, transactionsRequest.getTransactionList());
+                recommendation, transactionList);
 
         return ResponseEntity.ok(result);
     }

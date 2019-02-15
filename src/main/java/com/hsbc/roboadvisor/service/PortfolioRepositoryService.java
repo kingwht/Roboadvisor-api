@@ -31,7 +31,7 @@ public class PortfolioRepositoryService
         totalPercentIs100OrFail(portfolioRequest.getAllocations());
 
         PortfolioPreference portfolio = new PortfolioPreference(portfolioId, portfolioRequest.getDeviation(),
-                portfolioRequest.getPortfolioType(), portfolioRequest.getAllocations());
+                portfolioRequest.getType(), portfolioRequest.getAllocations());
 
         return this.portfolioRepository.save(portfolio);
     }
