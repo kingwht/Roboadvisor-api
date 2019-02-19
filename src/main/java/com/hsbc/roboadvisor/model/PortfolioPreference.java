@@ -13,6 +13,8 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Range;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hsbc.roboadvisor.service.JpaJsonConverter;
 
 import io.swagger.annotations.ApiModel;
@@ -79,7 +81,8 @@ public class PortfolioPreference {
     }
 
     public List<Allocation> getAllocations() {
-        return this.allocations;
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.convertValue(this.allocations, new TypeReference<List<Allocation>>() {});
     }
 
     public void setAllocations(List<Allocation> allocations) {
