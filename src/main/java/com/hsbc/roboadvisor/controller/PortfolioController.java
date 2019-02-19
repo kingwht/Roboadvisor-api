@@ -24,6 +24,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.hsbc.roboadvisor.exception.BadRequestException;
 import com.hsbc.roboadvisor.exception.ResourceNotFoundException;
 import com.hsbc.roboadvisor.model.Allocation;
+import com.hsbc.roboadvisor.model.Portfolio;
 import com.hsbc.roboadvisor.model.PortfolioPreference;
 import com.hsbc.roboadvisor.model.PortfolioType;
 import com.hsbc.roboadvisor.model.Recommendation;
@@ -32,6 +33,7 @@ import com.hsbc.roboadvisor.payload.DeviationRequest;
 import com.hsbc.roboadvisor.payload.PortfolioRequest;
 import com.hsbc.roboadvisor.service.PortfolioRepositoryService;
 import com.hsbc.roboadvisor.service.RecommendationRepositoryService;
+import com.hsbc.roboadvisor.service.RequestService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -52,6 +54,9 @@ public class PortfolioController {
     @Autowired
     private RecommendationRepositoryService recommendationRepositoryService;
 
+    @Autowired
+    private RequestService requestService;
+
     @ApiOperation(value = "Get portfolio asset allocation and deviation preference.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved portfolio preference.", response = PortfolioPreference.class),
@@ -67,7 +72,7 @@ public class PortfolioController {
 
         PortfolioPreference portfolio = portfolioService.findPreferenceByPortfolioId(portfolioId);
         if (portfolio == null) {
-            throw new ResourceNotFoundException("Portfolio", "PortfolioId", portfolioId);
+            throw new ResourceNotFoundException("Portfolio Preference", "PortfolioId", portfolioId);
         }
         return new ResponseEntity<>(portfolio, HttpStatus.OK);
     }
@@ -111,7 +116,7 @@ public class PortfolioController {
 
         PortfolioPreference portfolio = portfolioService.findPreferenceByPortfolioId(portfolioId);
         if (portfolio == null) {
-            throw new ResourceNotFoundException("Portfolio", "PortfolioId", portfolioId);
+            throw new ResourceNotFoundException("Portfolio Preference", "PortfolioId", portfolioId);
         }
 
         allocationListValidOrFail(allocationList, portfolio.getPortfolioType());
@@ -120,8 +125,7 @@ public class PortfolioController {
         return ResponseEntity.ok(allocationList);
     }
 
-    private void allocationListValidOrFail(List<Allocation> allocationList, PortfolioType portfolioType)
-    {
+    private void allocationListValidOrFail(List<Allocation> allocationList, PortfolioType portfolioType) {
         for (Allocation allocation : allocationList) {
             if (portfolioType.equals(PortfolioType.category) && allocation.getFundId() != null) {
                 throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
@@ -152,7 +156,7 @@ public class PortfolioController {
 
         Boolean portfolioExists = this.portfolioService.preferenceExistsByPortfolioId(portfolioId);
         if (!portfolioExists) {
-            throw new ResourceNotFoundException("Portfolio", "PortfolioId", portfolioId);
+            throw new ResourceNotFoundException("Portfolio Preference", "PortfolioId", portfolioId);
         }
 
         PortfolioPreference result = this.portfolioService.updateDeviationByPortfolioId(portfolioId, deviationRequest);
@@ -174,20 +178,28 @@ public class PortfolioController {
 
         PortfolioPreference portfolioPreference = portfolioService.findPreferenceByPortfolioId(portfolioId);
         if (portfolioPreference == null) {
-            throw new ResourceNotFoundException("Portfolio", "PortfolioId", portfolioId);
+            throw new ResourceNotFoundException("Portfolio Preference", "PortfolioId", portfolioId);
         }
 
-        Object portfolio = null; //TODO: get portfolio from calling /portfolio from Wilson's Api using the customer Id.
+        //TODO: Replace with below when fund system is implemented.
+        //List<Portfolio> customerPortfolioList = requestService.getPortfolios(customerId.toString());
+        List<Portfolio> customerPortfolioList = requestService.getPortfolios("73648");
+        Portfolio portfolio = customerPortfolioOrFail(customerPortfolioList, portfolioId);
 
         Recommendation recommendation = recommendationRepositoryService.findRecommendationByPortfolioId(portfolioId);
-        if (recommendation != null) {
-            recommendation = this.recommendationRepositoryService.updateRecommendation(recommendation,
-                    portfolio, portfolioPreference);
-        } else {
-            recommendation = this.recommendationRepositoryService.saveRecommendation(portfolio, portfolioPreference);
-        }
+
+        recommendation = this.recommendationRepositoryService.saveRecommendation(recommendation, portfolio, portfolioPreference);
 
         return ResponseEntity.ok(recommendation);
+    }
+
+    private Portfolio customerPortfolioOrFail(List<Portfolio> customerPortfolioList, Integer portfolioId) {
+        for (Portfolio portfolio : customerPortfolioList) {
+            if (portfolio.getId().equals(portfolioId)) {
+                return portfolio;
+            }
+        }
+        throw new ResourceNotFoundException("Portfolio", "Portfolio Id", portfolioId);
     }
 
     @ApiOperation(value = "Execute the rebalance recommendation.")
@@ -204,7 +216,7 @@ public class PortfolioController {
 
         PortfolioPreference portfolioPreference = portfolioService.findPreferenceByPortfolioId(portfolioId);
         if (portfolioPreference == null) {
-            throw new ResourceNotFoundException("Portfolio", "PortfolioId", portfolioId);
+            throw new ResourceNotFoundException("Portfolio Preference", "PortfolioId", portfolioId);
         }
 
         Recommendation recommendation = recommendationRepositoryService.findRecommendationByRecommendationId(recommendationId);
@@ -237,7 +249,7 @@ public class PortfolioController {
 
         PortfolioPreference portfolioPreference = portfolioService.findPreferenceByPortfolioId(portfolioId);
         if (portfolioPreference == null) {
-            throw new ResourceNotFoundException("Portfolio", "PortfolioId", portfolioId);
+            throw new ResourceNotFoundException("Portfolio Preference", "PortfolioId", portfolioId);
         }
 
         Recommendation recommendation = recommendationRepositoryService.findRecommendationByRecommendationId(recommendationId);
