@@ -2,6 +2,9 @@ package com.hsbc.roboadvisor.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.hsbc.roboadvisor.service.PortfolioRepositoryService;
+import com.hsbc.roboadvisor.service.RecommendationRepositoryService;
+import com.hsbc.roboadvisor.service.RequestService;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -16,6 +19,9 @@ public class PortfolioPreferenceControllerTest {
 
 	@InjectMocks
 	private PortfolioController portfolioController;
+	private PortfolioRepositoryService portfolioRepositoryService;
+	private RecommendationRepositoryService recommendationRepositoryService;
+	private RequestService requestService;
 
 	@Mock
 	private PortfolioRepository portfolioRepository;
@@ -25,7 +31,8 @@ public class PortfolioPreferenceControllerTest {
 	@BeforeClass
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		this.portfolioController = new PortfolioController();
+		this.portfolioController = new PortfolioController(portfolioRepositoryService,
+				recommendationRepositoryService, requestService);
 		this.mockMvc = MockMvcBuilders.standaloneSetup(this.portfolioController).build();
 	}
 
