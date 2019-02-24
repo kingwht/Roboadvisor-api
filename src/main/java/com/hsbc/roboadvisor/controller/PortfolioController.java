@@ -48,14 +48,23 @@ public class PortfolioController {
 
     private static final Logger _logger = LoggerFactory.getLogger(PortfolioController.class);
 
-    @Autowired
     private PortfolioRepositoryService portfolioService;
 
-    @Autowired
     private RecommendationRepositoryService recommendationRepositoryService;
 
-    @Autowired
     private RequestService requestService;
+
+    @Autowired
+    public PortfolioController(
+            PortfolioRepositoryService portfolioService,
+            RecommendationRepositoryService recommendationRepositoryService,
+            RequestService requestService) {
+        this.portfolioService = portfolioService;
+        this.recommendationRepositoryService = recommendationRepositoryService;
+        this.requestService = requestService;
+    }
+
+
 
     @ApiOperation(value = "Get portfolio asset allocation and deviation preference.")
     @ApiResponses(value = {
