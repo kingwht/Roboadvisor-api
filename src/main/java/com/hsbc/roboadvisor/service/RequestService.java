@@ -44,7 +44,7 @@ public class RequestService
         HttpHeaders headers = new HttpHeaders();
         headers.set("x-custid", custId);
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
-        String url = "https://us-central1-useful-memory-229303.cloudfunctions.net/portfolios"; //TODO: Update this to our own service?
+        String url = "https://us-central1-useful-memory-229303.cloudfunctions.net/portfolios2"; //TODO: Update this to our own service?
         ResponseEntity<List<Portfolio>> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity,
                 new ParameterizedTypeReference<List<Portfolio>>(){});
 

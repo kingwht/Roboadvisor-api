@@ -74,7 +74,7 @@ public class PortfolioController {
     })
     @GetMapping("/{portfolioId}")
     public ResponseEntity<?> getPortfolioPreference(
-        @RequestHeader(value = "x-custid") Integer customerId,
+        @RequestHeader(value = "x-custid") String customerId,
         @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId) {
 
         _logger.info("Getting portfolio id: {} for customer id: {}", portfolioId, customerId);
@@ -94,7 +94,7 @@ public class PortfolioController {
     })
     @PostMapping("/{portfolioId}")
     public ResponseEntity<?> createPortfolioPreference(
-        @RequestHeader(value = "x-custid") Integer customerId,
+        @RequestHeader(value = "x-custid") String customerId,
         @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
         @Valid @RequestBody PortfolioRequest portfolioRequest) {
 
@@ -117,7 +117,7 @@ public class PortfolioController {
     })
     @PutMapping("/{portfolioId}/allocations")
     public ResponseEntity<?> setPortfolioAllocation(
-            @RequestHeader(value = "x-custid") Integer customerId,
+            @RequestHeader(value = "x-custid") String customerId,
             @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
             @Valid @RequestBody  List<Allocation> allocationList) {
 
@@ -157,7 +157,7 @@ public class PortfolioController {
     })
     @PutMapping("/{portfolioId}/deviation")
     public ResponseEntity<?> setPortfolioDeviation(
-            @RequestHeader(value = "x-custid") Integer customerId,
+            @RequestHeader(value = "x-custid") String customerId,
             @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
             @Valid @RequestBody DeviationRequest deviationRequest) {
 
@@ -180,7 +180,7 @@ public class PortfolioController {
     })
     @PostMapping("/{portfolioId}/rebalance")
     public ResponseEntity<?> createRecommendation(
-            @RequestHeader(value = "x-custid") Integer customerId,
+            @RequestHeader(value = "x-custid") String customerId,
             @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId){
 
         _logger.info("Request to create recommendation for portfolio id: {} for customer id: {}", portfolioId, customerId);
@@ -217,7 +217,7 @@ public class PortfolioController {
     })
     @PostMapping("/{portfolioId}/recommendation/{recommendationId}/execute")
     public ResponseEntity<?> executeRecommendation(
-            @RequestHeader(value = "x-custid") Integer customerId,
+            @RequestHeader(value = "x-custid") String customerId,
             @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
             @ApiParam(value = "Recommendation ID", required = true) @PathVariable Integer recommendationId) {
 
@@ -249,7 +249,7 @@ public class PortfolioController {
     })
     @PutMapping("/{portfolioId}/recommendation/{recommendationId}/modify")
     public ResponseEntity<?> modifyRecommendation (
-            @RequestHeader(value = "x-custid") Integer customerId,
+            @RequestHeader(value = "x-custid") String customerId,
             @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
             @ApiParam(value = "Recommendation ID", required = true) @PathVariable Integer recommendationId,
             @Valid @RequestBody List<Transaction> transactionList) {
