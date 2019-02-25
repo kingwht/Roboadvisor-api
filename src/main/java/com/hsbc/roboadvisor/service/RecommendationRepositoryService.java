@@ -1,7 +1,6 @@
 package com.hsbc.roboadvisor.service;
 
 import static java.lang.Math.abs;
-import static java.lang.Math.min;
 import static java.math.BigDecimal.ROUND_FLOOR;
 import static java.math.BigDecimal.ROUND_HALF_EVEN;
 
@@ -14,13 +13,14 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.hsbc.roboadvisor.model.Allocation;
-import com.hsbc.roboadvisor.model.Holding;
-import com.hsbc.roboadvisor.model.Portfolio;
-import com.hsbc.roboadvisor.model.PortfolioPreference;
-import com.hsbc.roboadvisor.model.Recommendation;
-import com.hsbc.roboadvisor.model.Transaction;
-import com.hsbc.roboadvisor.model.TransactionType;
+import com.hsbc.roboadvisor.model.Fund.Fund;
+import com.hsbc.roboadvisor.model.Portfolio.Holding;
+import com.hsbc.roboadvisor.model.Portfolio.Portfolio;
+import com.hsbc.roboadvisor.model.PortfolioPreference.Allocation;
+import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioPreference;
+import com.hsbc.roboadvisor.model.Recommendation.Recommendation;
+import com.hsbc.roboadvisor.model.Recommendation.Transaction;
+import com.hsbc.roboadvisor.model.Recommendation.TransactionType;
 import com.hsbc.roboadvisor.repository.RecommendationRepository;
 
 @Service
@@ -41,7 +41,14 @@ public class RecommendationRepositoryService
         return this.recommendationRepository.findByPortfolioId(portfolioId);
     }
 
-    public Recommendation saveRecommendation(Recommendation recommendation, Portfolio portfolio, PortfolioPreference portfolioPreference) {
+    public Recommendation saveRecommendation(Recommendation recommendation, Portfolio portfolio,
+            List<Fund> fundsList, PortfolioPreference portfolioPreference) {
+
+        Map<Integer, BigDecimal> fundsMap = new HashMap<>(); //map of funds to unit price
+        for (Fund fund : fundsList) {
+            fundsMap.put(fund.getFundId(), fund.getPrice().getAmount());
+        }
+
         List<Allocation> fundPreferences = portfolioPreference.getAllocations();
         BigDecimal totalValue = new BigDecimal(0);
         Map<Integer, BigDecimal> preferenceMap = new HashMap<>(); //the preferred percent for each fund
@@ -54,7 +61,7 @@ public class RecommendationRepositoryService
             Holding holding = portfolio.getHoldings().get(i);
             totalValue = totalValue.add(holding.getBalance().getAmount());
             preferenceMap.put(fundPreferences.get(i).getFundId(), fundPreferences.get(i).getPercentage());
-            fundUnitPriceMap.put(holding.getFundId(), holding.getAvgUnitPrice().getAmount());
+            fundUnitPriceMap.put(holding.getFundId(), fundsMap.get(holding.getFundId()));
             fundUnitCountMap.put(holding.getFundId(), holding.getUnits());
         }
 

@@ -1,18 +1,20 @@
-package com.hsbc.roboadvisor.model;
+package com.hsbc.roboadvisor.model.Common;
 
 import java.math.BigDecimal;
 
-public class Volume
+import com.hsbc.roboadvisor.model.Portfolio.Currency;
+
+public class CurrencyAmount
 {
     private BigDecimal amount;
 
     private Currency currency;
 
-    public Volume() {
+    public CurrencyAmount() {
         //empty constructor
     }
 
-    public Volume(BigDecimal amount, Currency currency) {
+    public CurrencyAmount(BigDecimal amount, Currency currency) {
         this.amount = amount;
         this.currency = currency;
     }

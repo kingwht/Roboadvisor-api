@@ -23,17 +23,18 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.hsbc.roboadvisor.exception.BadRequestException;
 import com.hsbc.roboadvisor.exception.ResourceNotFoundException;
-import com.hsbc.roboadvisor.model.Allocation;
-import com.hsbc.roboadvisor.model.Portfolio;
-import com.hsbc.roboadvisor.model.PortfolioPreference;
-import com.hsbc.roboadvisor.model.PortfolioType;
-import com.hsbc.roboadvisor.model.Recommendation;
-import com.hsbc.roboadvisor.model.Transaction;
+import com.hsbc.roboadvisor.model.Fund.Fund;
+import com.hsbc.roboadvisor.model.Portfolio.Portfolio;
+import com.hsbc.roboadvisor.model.PortfolioPreference.Allocation;
+import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioPreference;
+import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioType;
+import com.hsbc.roboadvisor.model.Recommendation.Recommendation;
+import com.hsbc.roboadvisor.model.Recommendation.Transaction;
 import com.hsbc.roboadvisor.payload.DeviationRequest;
 import com.hsbc.roboadvisor.payload.PortfolioRequest;
+import com.hsbc.roboadvisor.service.FundRequestService;
 import com.hsbc.roboadvisor.service.PortfolioRepositoryService;
 import com.hsbc.roboadvisor.service.RecommendationRepositoryService;
-import com.hsbc.roboadvisor.service.RequestService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -52,16 +53,16 @@ public class PortfolioController {
 
     private RecommendationRepositoryService recommendationRepositoryService;
 
-    private RequestService requestService;
+    private FundRequestService fundRequestService;
 
     @Autowired
     public PortfolioController(
             PortfolioRepositoryService portfolioService,
             RecommendationRepositoryService recommendationRepositoryService,
-            RequestService requestService) {
+            FundRequestService fundRequestService) {
         this.portfolioService = portfolioService;
         this.recommendationRepositoryService = recommendationRepositoryService;
-        this.requestService = requestService;
+        this.fundRequestService = fundRequestService;
     }
 
 
@@ -190,14 +191,16 @@ public class PortfolioController {
             throw new ResourceNotFoundException("Portfolio Preference", "PortfolioId", portfolioId);
         }
 
-        //TODO: Replace with below when fund system is implemented.
-        //List<Portfolio> customerPortfolioList = requestService.getPortfolios(customerId.toString());
-        List<Portfolio> customerPortfolioList = requestService.getPortfolios("73648");
+
+        List<Portfolio> customerPortfolioList = fundRequestService.getPortfolios(customerId);
+        List<Fund> customerFundList = fundRequestService.getFunds(customerId);
+
         Portfolio portfolio = customerPortfolioOrFail(customerPortfolioList, portfolioId);
 
         Recommendation recommendation = recommendationRepositoryService.findRecommendationByPortfolioId(portfolioId);
 
-        recommendation = this.recommendationRepositoryService.saveRecommendation(recommendation, portfolio, portfolioPreference);
+        recommendation = this.recommendationRepositoryService.saveRecommendation(recommendation, portfolio,
+                customerFundList,portfolioPreference);
 
         return ResponseEntity.ok(recommendation);
     }

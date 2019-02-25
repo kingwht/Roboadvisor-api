@@ -1,4 +1,4 @@
-package com.hsbc.roboadvisor.model;
+package com.hsbc.roboadvisor.model.Recommendation;
 
 import java.util.List;
 import javax.persistence.Column;

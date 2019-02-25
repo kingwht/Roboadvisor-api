@@ -18,13 +18,14 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.hsbc.roboadvisor.model.Portfolio;
+import com.hsbc.roboadvisor.model.Fund.Fund;
+import com.hsbc.roboadvisor.model.Portfolio.Portfolio;
 
 @Service
-public class RequestService
+public class FundRequestService
 {
 
-    private static final Logger _logger = LoggerFactory.getLogger(RequestService.class);
+    private static final Logger _logger = LoggerFactory.getLogger(FundRequestService.class);
 
     private RestTemplate restTemplate = new RestTemplate();
 
@@ -37,8 +38,7 @@ public class RequestService
         restTemplate.setMessageConverters(messageConverters);
     }
 
-    public List<Portfolio> getPortfolios(String custId)
-    {
+    public List<Portfolio> getPortfolios(String custId) {
         _logger.info("Retrieving portfolio for {}.", custId);
 
         HttpHeaders headers = new HttpHeaders();
@@ -47,6 +47,19 @@ public class RequestService
         String url = "https://us-central1-useful-memory-229303.cloudfunctions.net/portfolios2"; //TODO: Update this to our own service?
         ResponseEntity<List<Portfolio>> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity,
                 new ParameterizedTypeReference<List<Portfolio>>(){});
+
+        return responseEntity.getBody();
+    }
+
+    public List<Fund> getFunds(String custId) {
+        _logger.info("Retrieving Funds customer: {}.", custId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("x-custid", custId);
+        HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
+        String url = "https://us-central1-useful-memory-229303.cloudfunctions.net/funds2/"; //TODO: Update this to our own service?
+        ResponseEntity<List<Fund>> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity,
+                new ParameterizedTypeReference<List<Fund>>(){});
 
         return responseEntity.getBody();
     }
