@@ -1,4 +1,6 @@
-package com.hsbc.roboadvisor.model;
+package com.hsbc.roboadvisor.model.Portfolio;
+
+import com.hsbc.roboadvisor.model.Common.CurrencyAmount;
 
 public class Holding
 {
@@ -6,19 +8,16 @@ public class Holding
 
     private Integer units;
 
-    private Volume balance;
-
-    private Volume avgUnitPrice;
+    private CurrencyAmount balance;
 
     public Holding() {
         //empty constructor
     }
 
-    public Holding(Integer fundId, Integer units, Volume balance, Volume avgUnitPrice) {
+    public Holding(Integer fundId, Integer units, CurrencyAmount balance) {
         this.fundId = fundId;
         this.units = units;
         this.balance = balance;
-        this.avgUnitPrice = avgUnitPrice;
     }
 
     public Integer getFundId() {
@@ -37,19 +36,11 @@ public class Holding
         this.units = units;
     }
 
-    public Volume getBalance() {
+    public CurrencyAmount getBalance() {
         return balance;
     }
 
-    public void setBalance(Volume balance) {
+    public void setBalance(CurrencyAmount balance) {
         this.balance = balance;
-    }
-
-    public Volume getAvgUnitPrice() {
-        return avgUnitPrice;
-    }
-
-    public void setAvgUnitPrice(Volume avgUnitPrice) {
-        this.avgUnitPrice = avgUnitPrice;
     }
 }

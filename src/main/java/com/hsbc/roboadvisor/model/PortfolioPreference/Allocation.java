@@ -1,4 +1,4 @@
-package com.hsbc.roboadvisor.model;
+package com.hsbc.roboadvisor.model.PortfolioPreference;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

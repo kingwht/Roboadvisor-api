@@ -1,4 +1,4 @@
-package com.hsbc.roboadvisor.model;
+package com.hsbc.roboadvisor.model.Portfolio;
 
 import java.io.Serializable;
 import java.util.List;

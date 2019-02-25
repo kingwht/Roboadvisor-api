@@ -1,4 +1,4 @@
-package com.hsbc.roboadvisor.model;
+package com.hsbc.roboadvisor.model.Recommendation;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
