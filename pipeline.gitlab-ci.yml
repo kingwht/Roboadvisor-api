@@ -1,0 +1,21 @@
+image: java:8
+
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  script: mvn package
+  artifacts:
+    paths:
+      - target/roboadvisor-0.0.1-SNAPSHOT.jar
+
+production:
+  stage: deploy
+  script:
+    - echo $DEPLOY_KEY_FILE_PRODUCTION > /tmp/$CI_PIPELINE_ID.json
+    - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
+    - mvn appengine:deploy -Pcloud
+  only:
+    - master
