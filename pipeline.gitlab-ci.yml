@@ -8,7 +8,7 @@ before_script:
   - wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-218.0.0-linux-x86.tar.gz
   - tar -xzf  google-cloud-sdk-218.0.0-linux-x86.tar.gz
   - ./google-cloud-sdk/install.sh
-  # - gcloud components install app-engine-java
+  - gcloud components install app-engine-java
 
 # build:
 #   stage: build
@@ -23,6 +23,7 @@ production:
     - echo $DEPLOY_KEY_FILE_PRODUCTION > /tmp/$CI_PIPELINE_ID.json
     - ./google-cloud-sdk/bin/gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
     - source /builds/cpsc319-2018w2/hsbc/formation/roboadvisor-api/google-cloud-sdk/path.bash.inc
+    - ./google-cloud-sdk/bin/gcloud config set project hsbc-roboadvisor
     - mvn appengine:deploy -Pcloud
   only:
     - master
