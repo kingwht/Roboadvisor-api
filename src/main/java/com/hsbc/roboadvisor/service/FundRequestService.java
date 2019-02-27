@@ -32,9 +32,14 @@ public class FundRequestService
     @PostConstruct
     public void init() {
         List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        converter.setSupportedMediaTypes(Collections.singletonList(MediaType.TEXT_HTML));
-        messageConverters.add(converter);
+        MappingJackson2HttpMessageConverter textHtmlConverter = new MappingJackson2HttpMessageConverter();
+        textHtmlConverter.setSupportedMediaTypes(Collections.singletonList(MediaType.TEXT_HTML));
+        messageConverters.add(textHtmlConverter);
+
+        MappingJackson2HttpMessageConverter ApplicationJson = new MappingJackson2HttpMessageConverter();
+        ApplicationJson.setSupportedMediaTypes(Collections.singletonList(MediaType.APPLICATION_JSON));
+        messageConverters.add(ApplicationJson);
+
         restTemplate.setMessageConverters(messageConverters);
     }
 
@@ -56,6 +61,7 @@ public class FundRequestService
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("x-custid", custId);
+        headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
         String url = "https://us-central1-useful-memory-229303.cloudfunctions.net/funds2/"; //TODO: Update this to our own service?
         ResponseEntity<List<Fund>> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity,
