@@ -23,7 +23,7 @@ public class SwaggerConfig
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo)
                 .select()
-                .paths(PathSelectors.regex("^/roboadvisor/portfolio.*"))
+                .paths(PathSelectors.regex("^/roboadvisor/.*"))
                 .build();
     }
 }
