@@ -65,8 +65,6 @@ public class PortfolioController {
         this.fundRequestService = fundRequestService;
     }
 
-
-
     @ApiOperation(value = "Get portfolio asset allocation and deviation preference.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved portfolio preference.", response = PortfolioPreference.class),
