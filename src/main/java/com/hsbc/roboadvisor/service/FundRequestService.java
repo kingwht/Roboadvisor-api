@@ -5,6 +5,10 @@ import java.util.Collections;
 import java.util.List;
 import javax.annotation.PostConstruct;
 
+import com.hsbc.roboadvisor.exception.BadRequestException;
+import com.hsbc.roboadvisor.model.Recommendation.Transaction;
+import com.hsbc.roboadvisor.payload.TransactionRequest;
+import com.hsbc.roboadvisor.payload.TransactionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -68,8 +72,8 @@ public class FundRequestService
         HttpHeaders headers = new HttpHeaders();
         headers.set("x-custid", customerId);
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
-        String url = "https://us-central1-useful-memory-229303.cloudfunctions.net/funds2/";
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        String url = "https://us-central1-useful-memory-229303.cloudfunctions.net/funds2";
         ResponseEntity<List<Fund>> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity,
                 new ParameterizedTypeReference<List<Fund>>(){});
 
@@ -86,7 +90,7 @@ public class FundRequestService
         HttpHeaders headers = new HttpHeaders();
         headers.set("x-custid", customerId);
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
         String url = "https://us-central1-useful-memory-229303.cloudfunctions.net/fund2/" + fundId;
         ResponseEntity<Fund> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity,
                 new ParameterizedTypeReference<Fund>(){});
@@ -98,4 +102,21 @@ public class FundRequestService
         return responseEntity.getBody();
     }
 
+    public TransactionResponse getTransaction(String customerId, TransactionRequest transactionRequest) {
+        _logger.info("Executing transcation for customer: {} with portfolio ID: {}.",
+                customerId, transactionRequest.getPortfolioId());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("x-custid", customerId);
+        //headers.setContentType(MediaType.APPLICATION_JSON); // Don't need content-type for this api.
+        HttpEntity<TransactionRequest> entity = new HttpEntity<TransactionRequest>(transactionRequest, headers);
+        String url = "https://us-central1-useful-memory-229303.cloudfunctions.net/transaction2";
+        ResponseEntity<TransactionResponse> responseEntity = restTemplate.exchange(url, HttpMethod.POST, entity,
+                new ParameterizedTypeReference<TransactionResponse>() {});
+
+        if (responseEntity.getStatusCode() != HttpStatus.OK ) {
+            throw new BadRequestException("The transaction fails");
+        }
+        return responseEntity.getBody();
+    }
 }
