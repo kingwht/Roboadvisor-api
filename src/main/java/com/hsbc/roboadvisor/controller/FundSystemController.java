@@ -5,16 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.hsbc.roboadvisor.payload.TransactionRequest;
+import com.hsbc.roboadvisor.payload.TransactionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.hsbc.roboadvisor.model.Fund.Fund;
 import com.hsbc.roboadvisor.model.Portfolio.Portfolio;
@@ -62,6 +61,18 @@ public class FundSystemController
 
         Fund fund = fundRequestService.getFund(customerId, fundId);
         return new ResponseEntity<>(fund, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "Execute the transaction.")
+    @PostMapping("/transaction")
+    public ResponseEntity<?> executeTransaction(
+            @RequestHeader(value = "x-custid") String customerId,
+            @RequestBody TransactionRequest transactionRequest) {
+        _logger.info("Execute the transaction for customer id: {} with portfolio Id {}", customerId,
+                transactionRequest.getPortfolioId());
+
+        TransactionResponse transactionResponse = fundRequestService.getTransaction(customerId, transactionRequest);
+        return new ResponseEntity<>(transactionResponse, HttpStatus.OK);
     }
 
     @ApiOperation(value = "Get total value of assets for a customer Id.")
