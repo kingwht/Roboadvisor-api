@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import javax.validation.Valid;
 
+import com.hsbc.roboadvisor.payload.TransactionRequest;
+import com.hsbc.roboadvisor.payload.TransactionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -235,13 +237,16 @@ public class PortfolioController {
         }
 
         try{
-            _logger.info("HERE WOULD BE WHERE YOU EXECUTE THE TRANSACTION");
-            //TODO: EXECUTE TRANSACTION
-        }catch (Exception e) {
-            //TODO: DEAL WITH EXECPTION
-        }
+            _logger.info("Execute the Transaction");
+            // Create the transaction request
+            TransactionRequest transactionRequest = new TransactionRequest(portfolioId, recommendation.getTransactions());
 
-        return ResponseEntity.ok().build();
+            // Execute Transaction
+            TransactionResponse transactionResponse = fundRequestService.executeTransaction(customerId, transactionRequest);
+            return ResponseEntity.ok(transactionResponse);
+        }catch (Exception e) {
+            throw new BadRequestException("The transaction fails");
+        }
     }
 
     @ApiOperation(value = "Update the transactions in the rebalance recommendation.")
