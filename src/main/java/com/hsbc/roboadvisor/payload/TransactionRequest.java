@@ -16,6 +16,14 @@ public class TransactionRequest {
     @NotNull
     private List<Transaction> instructions;
 
+    public TransactionRequest() {
+    }
+
+    public TransactionRequest(@NotNull Integer portfolioId, @NotNull List<Transaction> instructions) {
+        this.portfolioId = portfolioId;
+        this.instructions = instructions;
+    }
+
     public Integer getPortfolioId() {
         return portfolioId;
     }

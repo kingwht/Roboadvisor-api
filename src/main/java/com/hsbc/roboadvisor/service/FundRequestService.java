@@ -102,7 +102,7 @@ public class FundRequestService
         return responseEntity.getBody();
     }
 
-    public TransactionResponse getTransaction(String customerId, TransactionRequest transactionRequest) {
+    public TransactionResponse executeTransaction(String customerId, TransactionRequest transactionRequest) {
         _logger.info("Executing transcation for customer: {} with portfolio ID: {}.",
                 customerId, transactionRequest.getPortfolioId());
 
