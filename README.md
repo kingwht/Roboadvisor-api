@@ -13,6 +13,10 @@ RoboAdvisor Fund Rebalancer is an Web API that customers can use to manage their
 Build with unit test only:
 `mvn clean package`
 
+## Integration Test
+Run Springboot Integration test ONLY. Please ensure dev-tools is up and running.
+mvn verify -DskipSurefire
+
 ## Running RoboAdvisor Service
 Ensure docker is running with MySQL and Adminer containers running using the dev-tools.
 `mvn spring-boot:run`
