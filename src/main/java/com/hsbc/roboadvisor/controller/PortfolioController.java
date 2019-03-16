@@ -80,6 +80,14 @@ public class PortfolioController {
 
         _logger.info("Getting portfolio id: {} for customer id: {}", portfolioId, customerId);
 
+        if (customerId == null) {
+            throw new BadRequestException("customerId cannot be null.");
+        }
+
+        if (portfolioId == null) {
+            throw new BadRequestException("portfolioId cannot be null.");
+        }
+
         PortfolioPreference portfolio = portfolioService.findPreferenceByPortfolioId(portfolioId);
         if (portfolio == null) {
             throw new ResourceNotFoundException("Portfolio Preference", "PortfolioId", portfolioId);
@@ -106,7 +114,7 @@ public class PortfolioController {
         PortfolioPreference result = portfolioService.savePreference(portfolioId, portfolioRequest);
 
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/roboadvisor/{id}")
-            .buildAndExpand(result.getPortfolioId()).toUri();
+            .buildAndExpand(result.getId()).toUri();
 
         return ResponseEntity.created(location).build();
     }
@@ -129,7 +137,7 @@ public class PortfolioController {
             throw new ResourceNotFoundException("Portfolio Preference", "PortfolioId", portfolioId);
         }
 
-        allocationListValidOrFail(allocationList, portfolio.getPortfolioType());
+        allocationListValidOrFail(allocationList, portfolio.getType());
 
         this.portfolioService.updateAllocationsByPortfolioId(portfolioId, allocationList);
         return ResponseEntity.ok(allocationList);
@@ -185,6 +193,10 @@ public class PortfolioController {
             @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId){
 
         _logger.info("Request to create recommendation for portfolio id: {} for customer id: {}", portfolioId, customerId);
+
+        if (portfolioId == null) {
+            throw new BadRequestException("portfolioId cannot be null.");
+        }
 
         PortfolioPreference portfolioPreference = portfolioService.findPreferenceByPortfolioId(portfolioId);
         if (portfolioPreference == null) {
