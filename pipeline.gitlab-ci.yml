@@ -10,16 +10,25 @@ build:
   stage: compile
   script:
     - mvn clean compile
+  only:
+    - merge_requests
+    - master
     
 unit_test:
   stage: unit_test
   script:
     - mvn clean test
+  only:
+    - merge_requests
+    - master
     
 integration_test:
   stage: integration_test
   script: 
     - mvn clean -DskipSurefire integration-test
+  only:
+    - merge_requests
+    - master
 
 production:
   stage: deploy
