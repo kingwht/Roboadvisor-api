@@ -1,20 +1,20 @@
 package com.hsbc.roboadvisor.controller;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
 
-import com.hsbc.roboadvisor.model.PortfolioPreference.Allocation;
-import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioPreference;
-import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioType;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.when;
+import com.hsbc.roboadvisor.model.PortfolioPreference.Allocation;
+import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioPreference;
+import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioType;
 
 public class GetPortfolioPreferenceTest extends PortfolioPreferenceControllerTest {
 
@@ -71,9 +71,9 @@ public class GetPortfolioPreferenceTest extends PortfolioPreferenceControllerTes
             mockMvc.perform(MockMvcRequestBuilders.get("/roboadvisor/portfolio/" + PID1)
                     .header("x-custid", CID1))
                     .andExpect(MockMvcResultMatchers.status().isOk())
-                    .andExpect(MockMvcResultMatchers.jsonPath("$.id", is(PID1)))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.portfolioId", is(PID1)))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.deviation", is(deviation)))
-                    .andExpect(MockMvcResultMatchers.jsonPath("$.type", is(type.toString())))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.portfolioType", is(type.toString())))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.allocations", is(allocations)));
         } catch (Exception e){
             fail(e.getMessage());
