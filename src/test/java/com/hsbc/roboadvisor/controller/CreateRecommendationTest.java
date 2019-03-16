@@ -1,9 +1,6 @@
 package com.hsbc.roboadvisor.controller;
 import static org.hamcrest.CoreMatchers.is;
 
-import com.hsbc.roboadvisor.exception.BadRequestException;
-import com.hsbc.roboadvisor.exception.MissingHeaderException;
-import com.hsbc.roboadvisor.exception.ResourceNotFoundException;
 import com.hsbc.roboadvisor.model.Fund.Fund;
 import com.hsbc.roboadvisor.model.Portfolio.Portfolio;
 import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioPreference;
@@ -21,7 +18,6 @@ import java.util.List;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.testng.Assert.assertEquals;
 
 public class CreateRecommendationTest extends PortfolioPreferenceControllerTest {
@@ -96,7 +92,7 @@ public class CreateRecommendationTest extends PortfolioPreferenceControllerTest 
         portfolio.setId(1);
         portfolio.setCustomerId("abc");
         recommendation.setPortfolioId(1);
-        portfolioPreference.setId(1);
+        portfolioPreference.setPortfolioId(1);
 
         when(portfolioRepositoryService.findPreferenceByPortfolioId(portfolio.getId())).thenReturn(portfolioPreference);
         when(fundRequestService.getPortfolios(portfolio.getCustomerId())).thenReturn(Collections.emptyList());
@@ -135,7 +131,7 @@ public class CreateRecommendationTest extends PortfolioPreferenceControllerTest 
         portfolio.setId(1);
         portfolio.setCustomerId("abc");
         recommendation.setPortfolioId(1);
-        portfolioPreference.setId(1);
+        portfolioPreference.setPortfolioId(1);
 
         when(portfolioRepositoryService.findPreferenceByPortfolioId(portfolio.getId())).thenReturn(portfolioPreference);
         when(fundRequestService.getPortfolios(portfolio.getCustomerId())).thenReturn(customerPortfolioList);

@@ -28,7 +28,7 @@ public class PortfolioPreference {
     @Id
     @Range(min = 0)
     @Column(name = "portfolio_id")
-    private Integer id;
+    private Integer portfolioId;
 
     @NotNull
     @Column(name = "deviation")
@@ -38,7 +38,7 @@ public class PortfolioPreference {
     @NotNull
     @Column(name = "portfolio_type")
     @Enumerated(EnumType.STRING)
-    private PortfolioType type;
+    private PortfolioType portfolioType;
 
     @NotNull
     @Column(name = "allocations")
@@ -49,19 +49,19 @@ public class PortfolioPreference {
         //empty constructor
     }
 
-    public PortfolioPreference(Integer id, Integer deviation, PortfolioType type, List<Allocation> allocations) {
-        this.id = id;
+    public PortfolioPreference(Integer portfolioId, Integer deviation, PortfolioType portfolioType, List<Allocation> allocations) {
+        this.portfolioId = portfolioId;
         this.deviation = deviation;
-        this.type = type;
+        this.portfolioType = portfolioType;
         this.allocations = allocations;
     }
 
-    public Integer getId(){
-        return this.id;
+    public Integer getPortfolioId(){
+        return this.portfolioId;
     }
 
-    public void setId(Integer id){
-        this.id = id;
+    public void setPortfolioId(Integer portfolioId){
+        this.portfolioId = portfolioId;
     }
 
     public Integer getDeviation(){
@@ -72,12 +72,12 @@ public class PortfolioPreference {
         this.deviation = deviation;
     }
 
-    public PortfolioType getType(){
-        return this.type;
+    public PortfolioType getPortfolioType(){
+        return this.portfolioType;
     }
 
-    public void setType(PortfolioType type){
-        this.type = type;
+    public void setPortfolioType(PortfolioType portfolioType){
+        this.portfolioType = portfolioType;
     }
 
     public List<Allocation> getAllocations() {

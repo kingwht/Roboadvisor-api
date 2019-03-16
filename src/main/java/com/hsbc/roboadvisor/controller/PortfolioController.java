@@ -114,7 +114,7 @@ public class PortfolioController {
         PortfolioPreference result = portfolioService.savePreference(portfolioId, portfolioRequest);
 
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/roboadvisor/{id}")
-            .buildAndExpand(result.getId()).toUri();
+            .buildAndExpand(result.getPortfolioId()).toUri();
 
         return ResponseEntity.created(location).build();
     }
@@ -137,7 +137,7 @@ public class PortfolioController {
             throw new ResourceNotFoundException("Portfolio Preference", "PortfolioId", portfolioId);
         }
 
-        allocationListValidOrFail(allocationList, portfolio.getType());
+        allocationListValidOrFail(allocationList, portfolio.getPortfolioType());
 
         this.portfolioService.updateAllocationsByPortfolioId(portfolioId, allocationList);
         return ResponseEntity.ok(allocationList);
