@@ -90,7 +90,7 @@ public class RecommendationRepositoryService
         }
 
         if (recommendation == null) {
-            recommendation = new Recommendation(portfolioPreference.getPortfolioId(), transactions);
+            recommendation = new Recommendation(portfolioPreference.getId(), transactions);
         } else {
             recommendation.setTransactions(transactions);
         }
