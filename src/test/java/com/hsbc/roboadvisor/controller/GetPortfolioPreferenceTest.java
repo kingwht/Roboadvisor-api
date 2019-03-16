@@ -35,12 +35,12 @@ public class GetPortfolioPreferenceTest extends PortfolioPreferenceControllerTes
         // We assume that the getPortfolioPreference method relies on the portfolioRepositoryService
         when(portfolioRepositoryService.findPreferenceByPortfolioId(PID1)).thenReturn(pp1);
         when(portfolioRepositoryService.findPreferenceByPortfolioId(PID2)).thenReturn(null);
-        pp1.setId(PID1);
+        pp1.setPortfolioId(PID1);
         pp1.setDeviation(deviation);
-        pp1.setType(type);
+        pp1.setPortfolioType(type);
         pp1.setAllocations(allocations);
 
-        pp2.setId(PID2);
+        pp2.setPortfolioId(PID2);
     }
 
     @Test
