@@ -23,9 +23,14 @@ unit_test:
     - master
     
 integration_test:
+  services:
+    - mysql:latest
+  variables:
+    MYSQL_DATABASE: roboadvisor
+    MYSQL_ROOT_PASSWORD: roboadvisor
   stage: integration_test
   script: 
-    - mvn clean -DskipSurefire integration-test
+    - mvn clean -DskipSurefire integration-test -Ptest
   only:
     - merge_requests
     - master

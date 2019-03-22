@@ -80,8 +80,10 @@ public class PortfolioController {
 
         _logger.info("Getting portfolio id: {} for customer id: {}", portfolioId, customerId);
 
-        if (customerId == null) {
-            throw new BadRequestException("customerId cannot be null.");
+        if (customerId == null || customerId.isEmpty()) {
+            throw new BadRequestException(
+                    String.format("customerId cannot be null or empty.  Given: %s", customerId)
+            );
         }
 
         if (portfolioId == null) {
