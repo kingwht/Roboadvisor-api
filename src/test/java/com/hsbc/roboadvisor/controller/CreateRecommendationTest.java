@@ -1,24 +1,22 @@
 package com.hsbc.roboadvisor.controller;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
 
-import com.hsbc.roboadvisor.model.Fund.Fund;
-import com.hsbc.roboadvisor.model.Portfolio.Portfolio;
-import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioPreference;
-import com.hsbc.roboadvisor.model.Recommendation.Recommendation;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.testng.Assert.assertEquals;
+import com.hsbc.roboadvisor.model.Fund.Fund;
+import com.hsbc.roboadvisor.model.Portfolio.Portfolio;
+import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioPreference;
+import com.hsbc.roboadvisor.model.Recommendation.Recommendation;
 
 public class CreateRecommendationTest extends PortfolioPreferenceControllerTest {
 
@@ -106,7 +104,7 @@ public class CreateRecommendationTest extends PortfolioPreferenceControllerTest 
                     .header("x-custid", portfolio.getCustomerId()))
                     .andExpect(MockMvcResultMatchers.status().isNotFound());
         } catch (Exception e){
-            fail("Recieved unexpected exception: " + e.getMessage());
+            fail("Received unexpected exception: " + e.getMessage());
         }
     }
 
@@ -122,7 +120,7 @@ public class CreateRecommendationTest extends PortfolioPreferenceControllerTest 
                     .header("x-custid", portfolio.getCustomerId()))
                     .andExpect(MockMvcResultMatchers.status().isNotFound());
         } catch (Exception e){
-            fail("Recieved unexpected exception: " + e.getMessage());
+            fail("Received unexpected exception: " + e.getMessage());
         }
     }
 
@@ -147,7 +145,7 @@ public class CreateRecommendationTest extends PortfolioPreferenceControllerTest 
                     .andExpect(MockMvcResultMatchers.jsonPath("$.recommendationId", is(recommendation.getRecommendationId())))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.transactions", is(recommendation.getTransactions())));
         } catch (Exception e) {
-            fail("Recieved unexpected exception: " + e.getMessage());
+            fail("Received unexpected exception: " + e.getMessage());
         }
     }
 }
