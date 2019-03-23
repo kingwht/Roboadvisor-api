@@ -41,7 +41,7 @@ public class RecommendationRepositoryService
         return this.recommendationRepository.findByPortfolioId(portfolioId);
     }
 
-    public Recommendation saveRecommendation(Recommendation recommendation, Portfolio portfolio,
+    public Recommendation saveRecommendation(Portfolio portfolio,
             List<Fund> fundsList, PortfolioPreference portfolioPreference) {
 
         Map<Integer, BigDecimal> fundsMap = new HashMap<>(); //map of funds to unit price
@@ -89,11 +89,7 @@ public class RecommendationRepositoryService
             }
         }
 
-        if (recommendation == null) {
-            recommendation = new Recommendation(portfolioPreference.getPortfolioId(), transactions);
-        } else {
-            recommendation.setTransactions(transactions);
-        }
+        Recommendation recommendation = new Recommendation(portfolioPreference.getPortfolioId(), transactions);
 
         return this.recommendationRepository.save(recommendation);
     }

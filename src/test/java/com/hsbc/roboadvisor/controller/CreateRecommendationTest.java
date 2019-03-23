@@ -89,14 +89,13 @@ public class CreateRecommendationTest extends PortfolioPreferenceControllerTest 
     public void throwsIfPortfolioIdDoesNotExist(){
         portfolio.setId(1);
         portfolio.setCustomerId("abc");
-        recommendation.setPortfolioId(1);
         portfolioPreference.setPortfolioId(1);
 
         when(portfolioRepositoryService.findPreferenceByPortfolioId(portfolio.getId())).thenReturn(portfolioPreference);
         when(fundRequestService.getPortfolios(portfolio.getCustomerId())).thenReturn(Collections.emptyList());
         when(fundRequestService.getFunds(portfolio.getCustomerId())).thenReturn(Collections.emptyList());
         when(recommendationRepositoryService.findRecommendationByPortfolioId(portfolio.getId())).thenReturn(recommendation);
-        when(recommendationRepositoryService.saveRecommendation(recommendation, portfolio, Collections.emptyList(), portfolioPreference))
+        when(recommendationRepositoryService.saveRecommendation(portfolio, Collections.emptyList(), portfolioPreference))
                 .thenReturn(recommendation);
 
         try{
@@ -128,14 +127,13 @@ public class CreateRecommendationTest extends PortfolioPreferenceControllerTest 
     public void normalRequest() {
         portfolio.setId(1);
         portfolio.setCustomerId("abc");
-        recommendation.setPortfolioId(1);
         portfolioPreference.setPortfolioId(1);
 
         when(portfolioRepositoryService.findPreferenceByPortfolioId(portfolio.getId())).thenReturn(portfolioPreference);
         when(fundRequestService.getPortfolios(portfolio.getCustomerId())).thenReturn(customerPortfolioList);
         when(fundRequestService.getFunds(portfolio.getCustomerId())).thenReturn(customerFundList);
         when(recommendationRepositoryService.findRecommendationByPortfolioId(portfolio.getId())).thenReturn(recommendation);
-        when(recommendationRepositoryService.saveRecommendation(recommendation, portfolio, customerFundList, portfolioPreference))
+        when(recommendationRepositoryService.saveRecommendation(portfolio, customerFundList, portfolioPreference))
                 .thenReturn(recommendation);
 
         try{

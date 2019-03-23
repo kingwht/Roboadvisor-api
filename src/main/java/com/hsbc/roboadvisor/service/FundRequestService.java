@@ -5,10 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import javax.annotation.PostConstruct;
 
-import com.hsbc.roboadvisor.exception.BadRequestException;
-import com.hsbc.roboadvisor.model.Recommendation.Transaction;
-import com.hsbc.roboadvisor.payload.TransactionRequest;
-import com.hsbc.roboadvisor.payload.TransactionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -23,9 +19,12 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.hsbc.roboadvisor.exception.BadRequestException;
 import com.hsbc.roboadvisor.exception.ResourceNotFoundException;
 import com.hsbc.roboadvisor.model.Fund.Fund;
 import com.hsbc.roboadvisor.model.Portfolio.Portfolio;
+import com.hsbc.roboadvisor.payload.TransactionRequest;
+import com.hsbc.roboadvisor.payload.TransactionResponse;
 
 @Service
 public class FundRequestService
@@ -108,7 +107,6 @@ public class FundRequestService
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("x-custid", customerId);
-        //headers.setContentType(MediaType.APPLICATION_JSON); // Don't need content-type for this api.
         HttpEntity<TransactionRequest> entity = new HttpEntity<TransactionRequest>(transactionRequest, headers);
         String url = "https://us-central1-useful-memory-229303.cloudfunctions.net/transaction2";
         ResponseEntity<TransactionResponse> responseEntity = restTemplate.exchange(url, HttpMethod.POST, entity,
