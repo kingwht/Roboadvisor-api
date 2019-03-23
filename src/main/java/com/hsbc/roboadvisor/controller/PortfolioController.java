@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import javax.validation.Valid;
 
-import com.hsbc.roboadvisor.payload.TransactionRequest;
-import com.hsbc.roboadvisor.payload.TransactionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +32,8 @@ import com.hsbc.roboadvisor.model.Recommendation.Recommendation;
 import com.hsbc.roboadvisor.model.Recommendation.Transaction;
 import com.hsbc.roboadvisor.payload.DeviationRequest;
 import com.hsbc.roboadvisor.payload.PortfolioRequest;
+import com.hsbc.roboadvisor.payload.TransactionRequest;
+import com.hsbc.roboadvisor.payload.TransactionResponse;
 import com.hsbc.roboadvisor.service.FundRequestService;
 import com.hsbc.roboadvisor.service.PortfolioRepositoryService;
 import com.hsbc.roboadvisor.service.RecommendationRepositoryService;
@@ -205,15 +205,12 @@ public class PortfolioController {
             throw new ResourceNotFoundException("Portfolio Preference", "PortfolioId", portfolioId);
         }
 
-
         List<Portfolio> customerPortfolioList = fundRequestService.getPortfolios(customerId);
         List<Fund> customerFundList = fundRequestService.getFunds(customerId);
 
         Portfolio portfolio = customerPortfolioOrFail(customerPortfolioList, portfolioId);
 
-        Recommendation recommendation = recommendationRepositoryService.findRecommendationByPortfolioId(portfolioId);
-
-        recommendation = this.recommendationRepositoryService.saveRecommendation(recommendation, portfolio,
+        Recommendation recommendation = this.recommendationRepositoryService.saveRecommendation(portfolio,
                 customerFundList,portfolioPreference);
 
         return ResponseEntity.ok(recommendation);

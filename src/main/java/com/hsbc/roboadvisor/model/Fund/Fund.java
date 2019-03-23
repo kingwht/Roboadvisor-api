@@ -21,7 +21,7 @@ public class Fund implements Serializable
     private String fundName;
 
     public Fund() {
-        //empty constructor
+        // empty constructor
     }
 
     public Fund(List<AssetComposition> assetComposition, Integer fundId, Map<String,
