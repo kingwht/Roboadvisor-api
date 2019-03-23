@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.hsbc.roboadvisor.exception.BadRequestException;
+import com.hsbc.roboadvisor.exception.EmptyTransactionException;
 import com.hsbc.roboadvisor.exception.ResourceNotFoundException;
 import com.hsbc.roboadvisor.model.Fund.Fund;
 import com.hsbc.roboadvisor.model.Portfolio.Portfolio;
@@ -247,8 +248,12 @@ public class PortfolioController {
             throw new ResourceNotFoundException("Recommendation", "Recommendation Id", recommendationId);
         }
 
+        if (recommendation.getTransactions().size() == 0) {
+            throw new EmptyTransactionException("Recommendation transaction cannot be empty.");
+        }
+
         try{
-            _logger.info("Execute the Transaction");
+            _logger.info("Execute the recommendation: {} for customer id: {}", recommendationId, customerId);
             // Create the transaction request
             TransactionRequest transactionRequest = new TransactionRequest(portfolioId, recommendation.getTransactions());
 
