@@ -1,11 +1,10 @@
 package com.hsbc.roboadvisor.payload;
 
+import java.util.List;
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.hsbc.roboadvisor.model.Fund.TransactionDetail;
-import com.hsbc.roboadvisor.model.Recommendation.Transaction;
-
-import javax.validation.constraints.NotNull;
-import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransactionResponse {

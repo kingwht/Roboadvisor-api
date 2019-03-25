@@ -27,10 +27,10 @@ import com.hsbc.roboadvisor.payload.TransactionRequest;
 import com.hsbc.roboadvisor.payload.TransactionResponse;
 
 @Service
-public class FundRequestService
+public class FundSystemRequestService
 {
 
-    private static final Logger _logger = LoggerFactory.getLogger(FundRequestService.class);
+    private static final Logger _logger = LoggerFactory.getLogger(FundSystemRequestService.class);
 
     private RestTemplate restTemplate = new RestTemplate();
 
@@ -107,7 +107,7 @@ public class FundRequestService
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("x-custid", customerId);
-        HttpEntity<TransactionRequest> entity = new HttpEntity<TransactionRequest>(transactionRequest, headers);
+        HttpEntity<TransactionRequest> entity = new HttpEntity<>(transactionRequest, headers);
         String url = "https://us-central1-useful-memory-229303.cloudfunctions.net/transaction2";
         ResponseEntity<TransactionResponse> responseEntity = restTemplate.exchange(url, HttpMethod.POST, entity,
                 new ParameterizedTypeReference<TransactionResponse>() {});

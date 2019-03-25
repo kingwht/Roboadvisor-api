@@ -34,10 +34,12 @@ import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioType;
 import com.hsbc.roboadvisor.model.Recommendation.Recommendation;
 import com.hsbc.roboadvisor.model.Recommendation.Transaction;
 import com.hsbc.roboadvisor.payload.DeviationRequest;
+import com.hsbc.roboadvisor.payload.FundRecommendationRequest;
 import com.hsbc.roboadvisor.payload.PortfolioRequest;
 import com.hsbc.roboadvisor.payload.TransactionRequest;
 import com.hsbc.roboadvisor.payload.TransactionResponse;
-import com.hsbc.roboadvisor.service.FundRequestService;
+import com.hsbc.roboadvisor.service.FundRecommendationService;
+import com.hsbc.roboadvisor.service.FundSystemRequestService;
 import com.hsbc.roboadvisor.service.PortfolioRepositoryService;
 import com.hsbc.roboadvisor.service.RecommendationRepositoryService;
 
@@ -58,16 +60,20 @@ public class PortfolioController {
 
     private RecommendationRepositoryService recommendationRepositoryService;
 
-    private FundRequestService fundRequestService;
+    private FundSystemRequestService fundSystemRequestService;
+
+    private FundRecommendationService fundRecommendationService;
 
     @Autowired
     public PortfolioController(
             PortfolioRepositoryService portfolioService,
             RecommendationRepositoryService recommendationRepositoryService,
-            FundRequestService fundRequestService) {
+            FundSystemRequestService fundSystemRequestService,
+            FundRecommendationService fundRecommendationService) {
         this.portfolioService = portfolioService;
         this.recommendationRepositoryService = recommendationRepositoryService;
-        this.fundRequestService = fundRequestService;
+        this.fundSystemRequestService = fundSystemRequestService;
+        this.fundRecommendationService = fundRecommendationService;
     }
 
     @ApiOperation(value = "Get portfolio asset allocation and deviation preference.")
@@ -224,8 +230,8 @@ public class PortfolioController {
             throw new ResourceNotFoundException("Portfolio Preference", "PortfolioId", portfolioId);
         }
 
-        List<Portfolio> customerPortfolioList = fundRequestService.getPortfolios(customerId);
-        List<Fund> customerFundList = fundRequestService.getFunds(customerId);
+        List<Portfolio> customerPortfolioList = fundSystemRequestService.getPortfolios(customerId);
+        List<Fund> customerFundList = fundSystemRequestService.getFunds(customerId);
 
         Portfolio portfolio = customerPortfolioOrFail(customerPortfolioList, portfolioId);
 
@@ -242,6 +248,30 @@ public class PortfolioController {
             }
         }
         throw new ResourceNotFoundException("Portfolio", "Portfolio Id", portfolioId);
+    }
+
+    @ApiOperation(value = "Create a list of suggested transactions for the given category and budget.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully returned ranked list of recommended funds to purchase.")
+    })
+    @PostMapping("/rebalance/ranking")
+    public ResponseEntity<?> createCategoricalRanking(
+            @RequestHeader(value = "x-custid") String customerId,
+            @Valid @RequestBody FundRecommendationRequest fundRecommendationRequest) {
+
+        if (customerId == null || customerId.isEmpty()) {
+            throw new BadRequestException(
+                    String.format("customerId cannot be null or empty.  Given: %s", customerId)
+            );
+        }
+
+        List<Fund> customerFundList = fundSystemRequestService.getFunds(customerId);
+
+        // Returned list of transactions is in DESC order with highest score (most recommended) fund as first entry.
+        List<Transaction> transactionList = fundRecommendationService.getRecommendedTransactions(customerFundList,
+                fundRecommendationRequest.getFundCategory(), fundRecommendationRequest.getBudget());
+
+        return ResponseEntity.ok(transactionList);
     }
 
     @ApiOperation(value = "Execute the rebalance recommendation.")
@@ -276,7 +306,8 @@ public class PortfolioController {
             TransactionRequest transactionRequest = new TransactionRequest(portfolioId, recommendation.getTransactions());
 
             // Execute Transaction
-            TransactionResponse transactionResponse = fundRequestService.executeTransaction(customerId, transactionRequest);
+            TransactionResponse transactionResponse = fundSystemRequestService
+                    .executeTransaction(customerId, transactionRequest);
             return ResponseEntity.ok(transactionResponse);
         }catch (Exception e) {
             throw new BadRequestException("The transaction fails");
