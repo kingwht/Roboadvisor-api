@@ -175,7 +175,7 @@ public class PortfolioController {
 
     // Checks if all funds in a given portfolio preference are part of the customer's portfolio
     private void checkAllValidFundsInPortfolio(List<Allocation> allocationsList, String customerId, Integer portfolioId) {
-        List<Portfolio> customerPortfolioList = fundRequestService.getPortfolios(customerId);
+        List<Portfolio> customerPortfolioList = fundSystemRequestService.getPortfolios(customerId);
         List<Holding> portfolioFunds = customerPortfolioOrFail(customerPortfolioList,portfolioId).getHoldings();
 
         Map<Integer, Boolean> mapPortfolioFunds = portfolioFundstoMap(portfolioFunds);
@@ -356,7 +356,7 @@ public class PortfolioController {
 
 
    private void checkAllValidFundsInRecommendation(List<Transaction> transactions, String customerId, Integer portfolioID) {
-       List<Portfolio> customerPortfolioList = fundRequestService.getPortfolios(customerId);
+       List<Portfolio> customerPortfolioList = fundSystemRequestService.getPortfolios(customerId);
        List<Holding> portfolioFunds = customerPortfolioOrFail(customerPortfolioList,portfolioID).getHoldings();
 
        Map<Integer, Boolean> mapPortfolioFunds = portfolioFundstoMap(portfolioFunds);
