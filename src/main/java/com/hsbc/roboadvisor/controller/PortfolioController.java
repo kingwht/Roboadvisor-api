@@ -2,6 +2,7 @@ package com.hsbc.roboadvisor.controller;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.validation.Valid;
@@ -25,6 +26,7 @@ import com.hsbc.roboadvisor.exception.BadRequestException;
 import com.hsbc.roboadvisor.exception.EmptyTransactionException;
 import com.hsbc.roboadvisor.exception.ResourceNotFoundException;
 import com.hsbc.roboadvisor.model.Fund.Fund;
+import com.hsbc.roboadvisor.model.Portfolio.Holding;
 import com.hsbc.roboadvisor.model.Portfolio.Portfolio;
 import com.hsbc.roboadvisor.model.PortfolioPreference.Allocation;
 import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioPreference;
@@ -113,6 +115,7 @@ public class PortfolioController {
         _logger.info("Request to create portfolio with portfolio id: {} for customer id: {}", portfolioId, customerId);
 
         allocationListValidOrFail(portfolioRequest.getAllocations(), portfolioRequest.getType());
+        checkAllValidFundsInPortfolio(portfolioRequest.getAllocations(), customerId, portfolioId);
 
         PortfolioPreference result = portfolioService.savePreference(portfolioId, portfolioRequest);
 
@@ -142,6 +145,8 @@ public class PortfolioController {
 
         allocationListValidOrFail(allocationList, portfolio.getPortfolioType());
 
+        checkAllValidFundsInPortfolio(allocationList, customerId, portfolioId);
+
         this.portfolioService.updateAllocationsByPortfolioId(portfolioId, allocationList);
         return ResponseEntity.ok(allocationList);
     }
@@ -158,6 +163,19 @@ public class PortfolioController {
                 throw new BadRequestException("Missing Category or Fund Id. Please check again.");
             } else if (allocation.getCategory() != null && allocation.getFundId() != null) {
                 throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
+            }
+        }
+    }
+
+    // Checks if all funds in a given portfolio preference are part of the customer's portfolio
+    private void checkAllValidFundsInPortfolio(List<Allocation> allocationsList, String customerId, Integer portfolioId) {
+        List<Portfolio> customerPortfolioList = fundRequestService.getPortfolios(customerId);
+        List<Holding> portfolioFunds = customerPortfolioOrFail(customerPortfolioList,portfolioId).getHoldings();
+
+        Map<Integer, Boolean> mapPortfolioFunds = portfolioFundstoMap(portfolioFunds);
+        for (Allocation allocation : allocationsList) {
+            if (mapPortfolioFunds.get(allocation.getFundId()) == null) {
+                throw new BadRequestException("Cannot use a fundID that does not exist in a portfolio. Please try again.");
             }
         }
     }
@@ -288,9 +306,35 @@ public class PortfolioController {
             throw new ResourceNotFoundException("Recommendation", "Recommendation Id", recommendationId);
         }
 
+       checkAllValidFundsInRecommendation(transactionList, customerId, portfolioId);
+
+
         Recommendation result = this.recommendationRepositoryService.updateRecommendationTransactions(
                 recommendation, transactionList);
 
         return ResponseEntity.ok(result);
     }
+
+    private Map<Integer, Boolean> portfolioFundstoMap(List<Holding> portfolioFunds){
+        Map<Integer, Boolean> mapPortfolioFunds = new HashMap<>();
+        for (Holding fund : portfolioFunds) {
+            mapPortfolioFunds.put(fund.getFundId(), true);
+        }
+        return mapPortfolioFunds;
+}
+
+
+   private void checkAllValidFundsInRecommendation(List<Transaction> transactions, String customerId, Integer portfolioID) {
+       List<Portfolio> customerPortfolioList = fundRequestService.getPortfolios(customerId);
+       List<Holding> portfolioFunds = customerPortfolioOrFail(customerPortfolioList,portfolioID).getHoldings();
+
+       Map<Integer, Boolean> mapPortfolioFunds = portfolioFundstoMap(portfolioFunds);
+       for (Transaction transaction : transactions) {
+           if (mapPortfolioFunds.get(transaction.getFundId()) == null) {
+               throw new BadRequestException("Cannot use a fundID that does not exist in a portfolio. Please try again.");
+           }
+       }
+   }
+
+
 }
