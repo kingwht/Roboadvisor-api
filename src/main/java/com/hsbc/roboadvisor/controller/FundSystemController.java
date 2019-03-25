@@ -5,18 +5,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.hsbc.roboadvisor.payload.TransactionRequest;
-import com.hsbc.roboadvisor.payload.TransactionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.hsbc.roboadvisor.model.Fund.Fund;
 import com.hsbc.roboadvisor.model.Portfolio.Portfolio;
-import com.hsbc.roboadvisor.service.FundRequestService;
+import com.hsbc.roboadvisor.payload.TransactionRequest;
+import com.hsbc.roboadvisor.payload.TransactionResponse;
+import com.hsbc.roboadvisor.service.FundSystemRequestService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,7 +35,7 @@ public class FundSystemController
     private static final Logger _logger = LoggerFactory.getLogger(FundSystemController.class);
 
     @Autowired
-    private FundRequestService fundRequestService;
+    private FundSystemRequestService fundSystemRequestService;
 
     @ApiOperation(value = "Get List of Portfolio for a customer Id.")
     @GetMapping("/portfolios")
@@ -37,7 +43,7 @@ public class FundSystemController
             @RequestHeader(value = "x-custid") String customerId) {
         _logger.info("Getting portfolios for customer id: {}", customerId);
 
-        List<Portfolio> portfolioList = fundRequestService.getPortfolios(customerId);
+        List<Portfolio> portfolioList = fundSystemRequestService.getPortfolios(customerId);
         return new ResponseEntity<>(portfolioList, HttpStatus.OK);
     }
 
@@ -47,7 +53,7 @@ public class FundSystemController
             @RequestHeader(value = "x-custid") String customerId) {
         _logger.info("Getting Funds for customer id: {}", customerId);
 
-        List<Fund> funds = fundRequestService.getFunds(customerId);
+        List<Fund> funds = fundSystemRequestService.getFunds(customerId);
         return new ResponseEntity<>(funds, HttpStatus.OK);
     }
 
@@ -58,7 +64,7 @@ public class FundSystemController
             @PathVariable Integer fundId) {
         _logger.info("Getting fund {} for customer id: {}", fundId, customerId);
 
-        Fund fund = fundRequestService.getFund(customerId, fundId);
+        Fund fund = fundSystemRequestService.getFund(customerId, fundId);
         return new ResponseEntity<>(fund, HttpStatus.OK);
     }
 
@@ -70,7 +76,8 @@ public class FundSystemController
         _logger.info("Execute the transaction for customer id: {} with portfolio Id {}", customerId,
                 transactionRequest.getPortfolioId());
 
-        TransactionResponse transactionResponse = fundRequestService.executeTransaction(customerId, transactionRequest);
+        TransactionResponse transactionResponse = fundSystemRequestService
+                .executeTransaction(customerId, transactionRequest);
         return new ResponseEntity<>(transactionResponse, HttpStatus.OK);
     }
 
@@ -83,13 +90,13 @@ public class FundSystemController
         BigDecimal totalAsset = new BigDecimal(0);
 
         Map<Integer, BigDecimal> fundsMap = new HashMap<>();
-        List<Fund> funds = fundRequestService.getFunds(customerId);
+        List<Fund> funds = fundSystemRequestService.getFunds(customerId);
         funds.forEach(fund -> {
             fundsMap.put(fund.getFundId(),fund.getPrice().getAmount());
         });
 
         Map<Integer, Integer> fundIdUnitMap = new HashMap<>();
-        List<Portfolio> portfolios = fundRequestService.getPortfolios(customerId);
+        List<Portfolio> portfolios = fundSystemRequestService.getPortfolios(customerId);
         portfolios.forEach(portfolio -> portfolio.getHoldings().forEach(holding -> {
             if (!fundIdUnitMap.containsKey(holding.getFundId())) {
                 fundIdUnitMap.put(holding.getFundId(), holding.getUnits());

@@ -7,7 +7,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.testng.annotations.BeforeClass;
 
-import com.hsbc.roboadvisor.service.FundRequestService;
+import com.hsbc.roboadvisor.service.FundRecommendationService;
+import com.hsbc.roboadvisor.service.FundSystemRequestService;
 import com.hsbc.roboadvisor.service.PortfolioRepositoryService;
 import com.hsbc.roboadvisor.service.RecommendationRepositoryService;
 
@@ -18,14 +19,15 @@ public abstract class PortfolioPreferenceControllerTest {
 
 	@Mock protected PortfolioRepositoryService      portfolioRepositoryService;
 	@Mock protected RecommendationRepositoryService recommendationRepositoryService;
-	@Mock protected FundRequestService              fundRequestService;
-	protected MockMvc mockMvc;
+	@Mock protected FundSystemRequestService        fundSystemRequestService;
+	@Mock protected FundRecommendationService		fundRecommendationService;
+	protected       MockMvc                         mockMvc;
 
 	@BeforeClass
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
 		this.portfolioController = new PortfolioController(portfolioRepositoryService,
-				recommendationRepositoryService, fundRequestService);
+				recommendationRepositoryService, fundSystemRequestService, fundRecommendationService);
 		this.mockMvc = MockMvcBuilders.standaloneSetup(this.portfolioController).build();
 	}
 }

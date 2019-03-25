@@ -92,8 +92,8 @@ public class CreateRecommendationTest extends PortfolioPreferenceControllerTest 
         portfolioPreference.setPortfolioId(1);
 
         when(portfolioRepositoryService.findPreferenceByPortfolioId(portfolio.getId())).thenReturn(portfolioPreference);
-        when(fundRequestService.getPortfolios(portfolio.getCustomerId())).thenReturn(Collections.emptyList());
-        when(fundRequestService.getFunds(portfolio.getCustomerId())).thenReturn(Collections.emptyList());
+        when(fundSystemRequestService.getPortfolios(portfolio.getCustomerId())).thenReturn(Collections.emptyList());
+        when(fundSystemRequestService.getFunds(portfolio.getCustomerId())).thenReturn(Collections.emptyList());
         when(recommendationRepositoryService.findRecommendationByPortfolioId(portfolio.getId())).thenReturn(recommendation);
         when(recommendationRepositoryService.saveRecommendation(portfolio, Collections.emptyList(), portfolioPreference))
                 .thenReturn(recommendation);
@@ -130,8 +130,8 @@ public class CreateRecommendationTest extends PortfolioPreferenceControllerTest 
         portfolioPreference.setPortfolioId(1);
 
         when(portfolioRepositoryService.findPreferenceByPortfolioId(portfolio.getId())).thenReturn(portfolioPreference);
-        when(fundRequestService.getPortfolios(portfolio.getCustomerId())).thenReturn(customerPortfolioList);
-        when(fundRequestService.getFunds(portfolio.getCustomerId())).thenReturn(customerFundList);
+        when(fundSystemRequestService.getPortfolios(portfolio.getCustomerId())).thenReturn(customerPortfolioList);
+        when(fundSystemRequestService.getFunds(portfolio.getCustomerId())).thenReturn(customerFundList);
         when(recommendationRepositoryService.findRecommendationByPortfolioId(portfolio.getId())).thenReturn(recommendation);
         when(recommendationRepositoryService.saveRecommendation(portfolio, customerFundList, portfolioPreference))
                 .thenReturn(recommendation);
