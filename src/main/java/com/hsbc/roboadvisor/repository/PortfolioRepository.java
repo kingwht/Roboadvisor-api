@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioPreference;
 
 @Repository
-public interface PortfolioRepository extends CrudRepository<PortfolioPreference, String>
+public interface PortfolioRepository extends CrudRepository<PortfolioPreference, Integer>
 {
 
     PortfolioPreference findByPortfolioId(Integer portfolioId);
