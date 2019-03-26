@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hsbc.roboadvisor.model.Fund.Fund;
 import com.hsbc.roboadvisor.model.Portfolio.Holding;
@@ -23,6 +24,7 @@ import com.hsbc.roboadvisor.model.Recommendation.Transaction;
 import com.hsbc.roboadvisor.model.Recommendation.TransactionType;
 import com.hsbc.roboadvisor.repository.RecommendationRepository;
 
+@Transactional
 @Service
 public class RecommendationRepositoryService
 {

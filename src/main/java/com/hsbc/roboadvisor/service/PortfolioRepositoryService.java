@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hsbc.roboadvisor.exception.BadRequestException;
 import com.hsbc.roboadvisor.model.PortfolioPreference.Allocation;
@@ -13,6 +14,7 @@ import com.hsbc.roboadvisor.payload.DeviationRequest;
 import com.hsbc.roboadvisor.payload.PortfolioRequest;
 import com.hsbc.roboadvisor.repository.PortfolioRepository;
 
+@Transactional
 @Service
 public class PortfolioRepositoryService
 {

@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import com.hsbc.roboadvisor.exception.BadRequestException;
@@ -26,6 +27,7 @@ import com.hsbc.roboadvisor.model.Portfolio.Portfolio;
 import com.hsbc.roboadvisor.payload.TransactionRequest;
 import com.hsbc.roboadvisor.payload.TransactionResponse;
 
+@Transactional
 @Service
 public class FundSystemRequestService
 {
