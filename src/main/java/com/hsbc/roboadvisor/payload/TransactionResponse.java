@@ -12,11 +12,9 @@ public class TransactionResponse {
     @NotNull
     private Integer status;
 
-    @NotNull
-    private Integer portfolioId;
+    private Long portfolioId;
 
-    @NotNull
-    private Integer transactionId;
+    private Long transactionId;
 
     @NotNull
     private List<TransactionDetail> transactions;
@@ -25,11 +23,11 @@ public class TransactionResponse {
         return status;
     }
 
-    public Integer getPortfolioId() {
+    public Long getPortfolioId() {
         return portfolioId;
     }
 
-    public Integer getTransactionId() {
+    public Long getTransactionId() {
         return transactionId;
     }
 

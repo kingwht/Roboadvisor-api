@@ -10,7 +10,7 @@ public class Fund implements Serializable
 {
     private List<AssetComposition> assetComposition;
 
-    private Integer fundId;
+    private Long fundId;
 
     private Map<String, Double> averageReturns;
 
@@ -24,7 +24,7 @@ public class Fund implements Serializable
         // empty constructor
     }
 
-    public Fund(List<AssetComposition> assetComposition, Integer fundId, Map<String,
+    public Fund(List<AssetComposition> assetComposition, Long fundId, Map<String,
             Double> averageReturns, Integer category, CurrencyAmount price, String fundName) {
         this.assetComposition = assetComposition;
         this.fundId = fundId;
@@ -42,11 +42,11 @@ public class Fund implements Serializable
         this.assetComposition = assetComposition;
     }
 
-    public Integer getFundId() {
+    public Long getFundId() {
         return fundId;
     }
 
-    public void setFundId(Integer fundId) {
+    public void setFundId(Long fundId) {
         this.fundId = fundId;
     }
 

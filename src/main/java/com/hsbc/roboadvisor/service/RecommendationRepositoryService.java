@@ -31,15 +31,15 @@ public class RecommendationRepositoryService
     @Autowired
     private RecommendationRepository recommendationRepository;
 
-    public Boolean recommendationExistsByRecommendationId(Integer recommendationId) {
+    public Boolean recommendationExistsByRecommendationId(Long recommendationId) {
         return this.recommendationRepository.existsByPortfolioId(recommendationId);
     }
 
-    public Recommendation findRecommendationByRecommendationId(Integer recommendationId) {
+    public Recommendation findRecommendationByRecommendationId(Long recommendationId) {
         return this.recommendationRepository.findByRecommendationId(recommendationId);
     }
 
-    public Recommendation findRecommendationByPortfolioId(Integer portfolioId) {
+    public Recommendation findRecommendationByPortfolioId(Long portfolioId) {
         return this.recommendationRepository.findByPortfolioId(portfolioId);
     }
 
@@ -47,17 +47,17 @@ public class RecommendationRepositoryService
     public Recommendation saveRecommendation(Portfolio portfolio,
             List<Fund> fundsList, PortfolioPreference portfolioPreference) {
 
-        Map<Integer, BigDecimal> fundsMap = new HashMap<>(); //map of funds to unit price
+        Map<Long, BigDecimal> fundsMap = new HashMap<>(); //map of funds to unit price
         for (Fund fund : fundsList) {
             fundsMap.put(fund.getFundId(), fund.getPrice().getAmount());
         }
 
         List<Allocation> fundPreferences = portfolioPreference.getAllocations();
         BigDecimal totalValue = new BigDecimal(0);
-        Map<Integer, BigDecimal> preferenceMap = new HashMap<>(); //the preferred percent for each fund
-        Map<Integer, BigDecimal> fundPercentageMap = new HashMap<>(); //how many percent a fund occupies
-        Map<Integer, BigDecimal> fundUnitPriceMap = new HashMap<>(); //the unit price of each fund
-        Map<Integer, Integer> fundUnitCountMap = new HashMap<>(); //how many of each unit owned per fund
+        Map<Long, BigDecimal> preferenceMap = new HashMap<>(); //the preferred percent for each fund
+        Map<Long, BigDecimal> fundPercentageMap = new HashMap<>(); //how many percent a fund occupies
+        Map<Long, BigDecimal> fundUnitPriceMap = new HashMap<>(); //the unit price of each fund
+        Map<Long, Integer> fundUnitCountMap = new HashMap<>(); //how many of each unit owned per fund
         List<Transaction> transactions = new ArrayList<>();
 
         for (int i = 0; i < portfolio.getHoldings().size(); i++) {
@@ -75,7 +75,7 @@ public class RecommendationRepositoryService
             fundPercentageMap.put(holding.getFundId(), percent);
         }
 
-        for (Integer key : fundPercentageMap.keySet()) {
+        for (Long key : fundPercentageMap.keySet()) {
             BigDecimal percentDiff = preferenceMap.get(key).subtract(fundPercentageMap.get(key));
             if ( percentDiff.abs().compareTo(new BigDecimal(portfolioPreference.getDeviation())) == 1) {
                 int units = percentDiff.divide(new BigDecimal(100), 10, ROUND_HALF_EVEN)
@@ -86,7 +86,7 @@ public class RecommendationRepositoryService
                 if ( units > 0 ) {
                     transactions.add(new Transaction(TransactionType.buy, key, units));
                 }else if ( units < 0 ) {
-                    int amount = abs(units) > fundUnitCountMap.get(key)? fundUnitCountMap.get(key) : abs(units);
+                    Integer amount = abs(units) > fundUnitCountMap.get(key)? fundUnitCountMap.get(key) : abs(units);
                     transactions.add(new Transaction(TransactionType.sell, key, amount));
                 }
             }

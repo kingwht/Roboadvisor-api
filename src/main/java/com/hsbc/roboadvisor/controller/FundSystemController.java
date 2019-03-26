@@ -61,7 +61,7 @@ public class FundSystemController
     @GetMapping("/funds/{fundId}")
     public ResponseEntity<?> getFund(
             @RequestHeader(value = "x-custid") String customerId,
-            @PathVariable Integer fundId) {
+            @PathVariable Long fundId) {
         _logger.info("Getting fund {} for customer id: {}", fundId, customerId);
 
         Fund fund = fundSystemRequestService.getFund(customerId, fundId);
@@ -89,13 +89,13 @@ public class FundSystemController
 
         BigDecimal totalAsset = new BigDecimal(0);
 
-        Map<Integer, BigDecimal> fundsMap = new HashMap<>();
+        Map<Long, BigDecimal> fundsMap = new HashMap<>();
         List<Fund> funds = fundSystemRequestService.getFunds(customerId);
         funds.forEach(fund -> {
             fundsMap.put(fund.getFundId(),fund.getPrice().getAmount());
         });
 
-        Map<Integer, Integer> fundIdUnitMap = new HashMap<>();
+        Map<Long, Integer> fundIdUnitMap = new HashMap<>();
         List<Portfolio> portfolios = fundSystemRequestService.getPortfolios(customerId);
         portfolios.forEach(portfolio -> portfolio.getHoldings().forEach(holding -> {
             if (!fundIdUnitMap.containsKey(holding.getFundId())) {
@@ -106,7 +106,7 @@ public class FundSystemController
             }
         }));
 
-        for (Integer key : fundIdUnitMap.keySet()) {
+        for (Long key : fundIdUnitMap.keySet()) {
             BigDecimal currentValue = fundsMap.get(key);
             Integer units = fundIdUnitMap.get(key);
             totalAsset = totalAsset.add(currentValue.multiply(new BigDecimal(units)));
