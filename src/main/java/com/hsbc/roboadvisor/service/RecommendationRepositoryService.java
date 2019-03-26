@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hsbc.roboadvisor.model.Fund.Fund;
@@ -24,7 +25,6 @@ import com.hsbc.roboadvisor.model.Recommendation.Transaction;
 import com.hsbc.roboadvisor.model.Recommendation.TransactionType;
 import com.hsbc.roboadvisor.repository.RecommendationRepository;
 
-@Transactional
 @Service
 public class RecommendationRepositoryService
 {
@@ -43,6 +43,7 @@ public class RecommendationRepositoryService
         return this.recommendationRepository.findByPortfolioId(portfolioId);
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public Recommendation saveRecommendation(Portfolio portfolio,
             List<Fund> fundsList, PortfolioPreference portfolioPreference) {
 
@@ -96,6 +97,7 @@ public class RecommendationRepositoryService
         return this.recommendationRepository.save(recommendation);
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public Recommendation updateRecommendationTransactions(Recommendation recommendation, List<Transaction> transactionList) {
         recommendation.setTransactions(transactionList);
 
