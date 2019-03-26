@@ -13,6 +13,7 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hsbc.roboadvisor.exception.BadRequestException;
 import com.hsbc.roboadvisor.model.Fund.AssetComposition;
@@ -20,6 +21,7 @@ import com.hsbc.roboadvisor.model.Fund.Fund;
 import com.hsbc.roboadvisor.model.Recommendation.Transaction;
 import com.hsbc.roboadvisor.model.Recommendation.TransactionType;
 
+@Transactional
 @Service
 public class FundRecommendationService
 {
