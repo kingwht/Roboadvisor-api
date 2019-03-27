@@ -46,6 +46,5 @@ production:
     - source /builds/cpsc319-2018w2/hsbc/formation/roboadvisor-api/google-cloud-sdk/path.bash.inc
     - ./google-cloud-sdk/bin/gcloud config set project hsbc-roboadvisor
     - mvn appengine:deploy -Pcloud
-  retry: 2
   only:
     - master
