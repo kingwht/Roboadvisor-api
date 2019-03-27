@@ -26,9 +26,8 @@ import io.swagger.annotations.ApiModel;
 public class PortfolioPreference {
 
     @Id
-    @Range(min = 0)
     @Column(name = "portfolio_id")
-    private Integer portfolioId;
+    private String portfolioId;
 
     @NotNull
     @Column(name = "deviation")
@@ -49,18 +48,18 @@ public class PortfolioPreference {
         //empty constructor
     }
 
-    public PortfolioPreference(Integer portfolioId, Integer deviation, PortfolioType portfolioType, List<Allocation> allocations) {
+    public PortfolioPreference(String portfolioId, Integer deviation, PortfolioType portfolioType, List<Allocation> allocations) {
         this.portfolioId = portfolioId;
         this.deviation = deviation;
         this.portfolioType = portfolioType;
         this.allocations = allocations;
     }
 
-    public Integer getPortfolioId(){
+    public String getPortfolioId(){
         return this.portfolioId;
     }
 
-    public void setPortfolioId(Integer portfolioId){
+    public void setPortfolioId(String portfolioId){
         this.portfolioId = portfolioId;
     }
 

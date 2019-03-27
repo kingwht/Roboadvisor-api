@@ -18,8 +18,8 @@ import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioType;
 
 public class GetPortfolioPreferenceTest extends PortfolioPreferenceControllerTest {
 
-    private static final Integer PID1 = 1;
-    private static final Integer PID2 = 2;
+    private static final String PID1 = "ID1";
+    private static final String PID2 = "ID2";
     private static final String CID1 = "cid1";
     private static final Integer deviation = 1;
     private static final PortfolioType type = PortfolioType.fund;

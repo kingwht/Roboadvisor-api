@@ -8,9 +8,8 @@ import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioPreference;
 @Repository
 public interface PortfolioRepository extends CrudRepository<PortfolioPreference, String>
 {
+    PortfolioPreference findByPortfolioId(String portfolioId);
 
-    PortfolioPreference findByPortfolioId(Integer portfolioId);
-
-    Boolean existsByPortfolioId(Integer portfolioId);
+    Boolean existsByPortfolioId(String portfolioId);
     
 }

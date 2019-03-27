@@ -102,7 +102,7 @@ public class FundSystemRequestService
     }
 
     public TransactionResponse executeTransaction(String customerId, TransactionRequest transactionRequest) {
-        _logger.info("Executing transcation for customer: {} with portfolio ID: {}.",
+        _logger.info("Executing transaction for customer: {} with portfolio ID: {}.",
                 customerId, transactionRequest.getPortfolioId());
 
         HttpHeaders headers = new HttpHeaders();

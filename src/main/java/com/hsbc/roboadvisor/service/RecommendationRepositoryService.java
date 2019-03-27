@@ -29,15 +29,11 @@ public class RecommendationRepositoryService
     @Autowired
     private RecommendationRepository recommendationRepository;
 
-    public Boolean recommendationExistsByRecommendationId(Integer recommendationId) {
-        return this.recommendationRepository.existsByPortfolioId(recommendationId);
-    }
-
     public Recommendation findRecommendationByRecommendationId(Integer recommendationId) {
         return this.recommendationRepository.findByRecommendationId(recommendationId);
     }
 
-    public Recommendation findRecommendationByPortfolioId(Integer portfolioId) {
+    public Recommendation findRecommendationByPortfolioId(String portfolioId) {
         return this.recommendationRepository.findByPortfolioId(portfolioId);
     }
 
