@@ -14,7 +14,8 @@ public class Transaction
     @Enumerated(EnumType.STRING)
     private TransactionType action;
 
-    private Long fundId;
+    @NotNull
+    private Integer fundId;
 
     @NotNull
     @Min(value = 0)
@@ -24,7 +25,7 @@ public class Transaction
         //empty constructor
     }
 
-    public Transaction(TransactionType transactionType, Long fundId, Integer units) {
+    public Transaction(TransactionType transactionType, Integer fundId, Integer units) {
         this.action = transactionType;
         this.fundId = fundId;
         this.units = units;
@@ -38,11 +39,11 @@ public class Transaction
         this.action = transactionType;
     }
 
-    public Long getFundId() {
+    public Integer getFundId() {
         return fundId;
     }
 
-    public void setFundId(Long fundId) {
+    public void setFundId(Integer fundId) {
         this.fundId = fundId;
     }
 

@@ -22,14 +22,17 @@ import io.swagger.annotations.ApiModelProperty;
 public class Recommendation
 {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "recommendation_id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @NotNull
+    @Column(name = "recommendation_id")
     @ApiModelProperty(value = "Recommendation Id for the specified recommendation.")
-    private Long recommendationId;
+    private Integer recommendationId;
 
+    @NotNull
     @Column(name = "portfolio_id")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ApiModelProperty(value = "The associated portfolio Id for the recommendation.")
-    private Long portfolioId;
+    private Integer portfolioId;
 
     @NotNull
     @Column(name = "transactions")
@@ -41,30 +44,30 @@ public class Recommendation
         //empty constructor
     }
 
-    public Recommendation(Long portfolioId, List<Transaction> transactionList) {
+    public Recommendation(Integer portfolioId, List<Transaction> transactionList) {
         this.portfolioId = portfolioId;
         this.transactionList = transactionList;
     }
 
-    public Recommendation(Long recommendationId, Long portfolioId, List<Transaction> transactionList) {
+    public Recommendation(Integer recommendationId, Integer portfolioId, List<Transaction> transactionList) {
         this.recommendationId = recommendationId;
         this.portfolioId = portfolioId;
         this.transactionList = transactionList;
     }
 
-    public Long getRecommendationId() {
+    public Integer getRecommendationId() {
         return recommendationId;
     }
 
-    public void setRecommendationId(Long recommendationId) {
+    public void setRecommendationId(Integer recommendationId) {
         this.recommendationId = recommendationId;
     }
 
-    public Long getPortfolioId() {
+    public Integer getPortfolioId() {
         return portfolioId;
     }
 
-    public void setPortfolioId(Long portfolioId) {
+    public void setPortfolioId(Integer portfolioId) {
         this.portfolioId = portfolioId;
     }
 

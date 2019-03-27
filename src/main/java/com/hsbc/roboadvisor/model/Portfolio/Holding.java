@@ -4,7 +4,7 @@ import com.hsbc.roboadvisor.model.Common.CurrencyAmount;
 
 public class Holding
 {
-    private Long fundId;
+    private Integer fundId;
 
     private Integer units;
 
@@ -14,17 +14,17 @@ public class Holding
         //empty constructor
     }
 
-    public Holding(Long fundId, Integer units, CurrencyAmount balance) {
+    public Holding(Integer fundId, Integer units, CurrencyAmount balance) {
         this.fundId = fundId;
         this.units = units;
         this.balance = balance;
     }
 
-    public Long getFundId() {
+    public Integer getFundId() {
         return fundId;
     }
 
-    public void setFundId(Long fundId) {
+    public void setFundId(Integer fundId) {
         this.fundId = fundId;
     }
 

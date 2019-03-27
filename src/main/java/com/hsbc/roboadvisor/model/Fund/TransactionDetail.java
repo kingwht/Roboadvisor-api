@@ -1,12 +1,12 @@
 package com.hsbc.roboadvisor.model.Fund;
 
+import com.hsbc.roboadvisor.model.Common.CurrencyAmount;
+import com.hsbc.roboadvisor.model.Recommendation.TransactionType;
+
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-
-import com.hsbc.roboadvisor.model.Common.CurrencyAmount;
-import com.hsbc.roboadvisor.model.Recommendation.TransactionType;
 
 public class TransactionDetail {
 
@@ -15,7 +15,7 @@ public class TransactionDetail {
     private TransactionType action;
 
     @NotNull
-    private Long fundId;
+    private Integer fundId;
 
     @NotNull
     @Min(value = 0)
@@ -32,11 +32,11 @@ public class TransactionDetail {
         this.action = action;
     }
 
-    public Long getFundId() {
+    public Integer getFundId() {
         return fundId;
     }
 
-    public void setFundId(Long fundId) {
+    public void setFundId(Integer fundId) {
         this.fundId = fundId;
     }
 

@@ -14,7 +14,7 @@ import io.swagger.annotations.ApiModelProperty;
 public class Allocation implements Serializable
 {
     @ApiModelProperty(value = "Fund Id for the specified allocation.")
-    private Long fundId;
+    private Integer fundId;
 
     @ApiModelProperty(hidden = true, value = "Category for the specified allocation.")
     private Integer category;
@@ -27,17 +27,17 @@ public class Allocation implements Serializable
         //empty constructor
     }
 
-    public Allocation(Long fundId, Integer category, BigDecimal percentage) {
+    public Allocation(Integer fundId, Integer category, BigDecimal percentage) {
         this.fundId = fundId;
         this.category = category;
         this.percentage = percentage;
     }
 
-    public Long getFundId() {
+    public Integer getFundId() {
         return this.fundId;
     }
 
-    public void setFundId(Long fundId) {
+    public void setFundId(Integer fundId) {
         this.fundId = fundId;
     }
 

@@ -18,11 +18,11 @@ import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioType;
 
 public class GetPortfolioPreferenceTest extends PortfolioPreferenceControllerTest {
 
-    private static final Long             PID1        = 1L;
-    private static final Long             PID2        = 2L;
-    private static final String           CID1        = "cid1";
-    private static final Integer          deviation   = 1;
-    private static final PortfolioType    type        = PortfolioType.fund;
+    private static final Integer PID1 = 1;
+    private static final Integer PID2 = 2;
+    private static final String CID1 = "cid1";
+    private static final Integer deviation = 1;
+    private static final PortfolioType type = PortfolioType.fund;
     private static final List<Allocation> allocations = new ArrayList<Allocation>();
 
     private PortfolioPreference pp1 = new PortfolioPreference();
@@ -71,7 +71,7 @@ public class GetPortfolioPreferenceTest extends PortfolioPreferenceControllerTes
             mockMvc.perform(MockMvcRequestBuilders.get("/roboadvisor/portfolio/" + PID1)
                     .header("x-custid", CID1))
                     .andExpect(MockMvcResultMatchers.status().isOk())
-                    .andExpect(MockMvcResultMatchers.jsonPath("$.portfolioId", is(1)))
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.portfolioId", is(PID1)))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.deviation", is(deviation)))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.portfolioType", is(type.toString())))
                     .andExpect(MockMvcResultMatchers.jsonPath("$.allocations", is(allocations)));

@@ -21,16 +21,16 @@ public class PortfolioRepositoryService
     @Autowired
     private PortfolioRepository portfolioRepository;
 
-    public PortfolioPreference findPreferenceByPortfolioId(Long portfolioId) {
+    public PortfolioPreference findPreferenceByPortfolioId(Integer portfolioId) {
         return this.portfolioRepository.findByPortfolioId(portfolioId);
     }
 
-    public Boolean preferenceExistsByPortfolioId(Long portfolioId) {
+    public Boolean preferenceExistsByPortfolioId(Integer portfolioId) {
         return this.portfolioRepository.existsByPortfolioId(portfolioId);
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public PortfolioPreference savePreference(Long portfolioId, PortfolioRequest portfolioRequest) {
+    public PortfolioPreference savePreference(Integer portfolioId, PortfolioRequest portfolioRequest) {
         totalPercentIs100OrFail(portfolioRequest.getAllocations());
 
         PortfolioPreference portfolio = new PortfolioPreference(portfolioId, portfolioRequest.getDeviation(),
@@ -40,7 +40,7 @@ public class PortfolioRepositoryService
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public PortfolioPreference updateDeviationByPortfolioId(Long portfolioId, DeviationRequest deviationRequest) {
+    public PortfolioPreference updateDeviationByPortfolioId(Integer portfolioId, DeviationRequest deviationRequest) {
         PortfolioPreference portfolio = this.portfolioRepository.findByPortfolioId(portfolioId);
         portfolio.setDeviation(deviationRequest.getDeviation());
 
@@ -48,7 +48,7 @@ public class PortfolioRepositoryService
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public PortfolioPreference updateAllocationsByPortfolioId(Long portfolioId, List<Allocation> allocationList) {
+    public PortfolioPreference updateAllocationsByPortfolioId(Integer portfolioId, List<Allocation> allocationList) {
         totalPercentIs100OrFail(allocationList);
 
         PortfolioPreference portfolio = this.portfolioRepository.findByPortfolioId(portfolioId);

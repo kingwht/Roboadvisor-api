@@ -85,7 +85,7 @@ public class FundSystemRequestService
         return responseEntity.getBody();
     }
 
-    public Fund getFund(String customerId, Long fundId) {
+    public Fund getFund(String customerId, Integer fundId) {
         _logger.info("Retrieving Fund {} for customer: {}.", fundId, customerId);
 
         HttpHeaders headers = new HttpHeaders();
