@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.hsbc.roboadvisor.model.Recommendation.Recommendation;
 
 @Repository
-public interface RecommendationRepository extends CrudRepository<Recommendation, Integer>
+public interface RecommendationRepository extends CrudRepository<Recommendation, String>
 {
     Recommendation findByPortfolioId(Integer portfolioId);
 
