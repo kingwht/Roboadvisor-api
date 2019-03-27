@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hsbc.roboadvisor.exception.BadRequestException;
@@ -15,6 +14,7 @@ import com.hsbc.roboadvisor.payload.DeviationRequest;
 import com.hsbc.roboadvisor.payload.PortfolioRequest;
 import com.hsbc.roboadvisor.repository.PortfolioRepository;
 
+@Transactional
 @Service
 public class PortfolioRepositoryService
 {
@@ -29,7 +29,6 @@ public class PortfolioRepositoryService
         return this.portfolioRepository.existsByPortfolioId(portfolioId);
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
     public PortfolioPreference savePreference(Integer portfolioId, PortfolioRequest portfolioRequest) {
         totalPercentIs100OrFail(portfolioRequest.getAllocations());
 
@@ -39,7 +38,7 @@ public class PortfolioRepositoryService
         return this.portfolioRepository.save(portfolio);
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
+
     public PortfolioPreference updateDeviationByPortfolioId(Integer portfolioId, DeviationRequest deviationRequest) {
         PortfolioPreference portfolio = this.portfolioRepository.findByPortfolioId(portfolioId);
         portfolio.setDeviation(deviationRequest.getDeviation());
@@ -47,7 +46,6 @@ public class PortfolioRepositoryService
         return this.portfolioRepository.save(portfolio);
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
     public PortfolioPreference updateAllocationsByPortfolioId(Integer portfolioId, List<Allocation> allocationList) {
         totalPercentIs100OrFail(allocationList);
 
