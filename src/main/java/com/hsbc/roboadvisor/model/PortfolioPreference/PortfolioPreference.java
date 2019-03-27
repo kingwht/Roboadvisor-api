@@ -28,7 +28,7 @@ public class PortfolioPreference {
     @Id
     @Range(min = 0)
     @Column(name = "portfolio_id")
-    private Integer portfolioId;
+    private Long portfolioId;
 
     @NotNull
     @Column(name = "deviation")
@@ -49,18 +49,18 @@ public class PortfolioPreference {
         //empty constructor
     }
 
-    public PortfolioPreference(Integer portfolioId, Integer deviation, PortfolioType portfolioType, List<Allocation> allocations) {
+    public PortfolioPreference(Long portfolioId, Integer deviation, PortfolioType portfolioType, List<Allocation> allocations) {
         this.portfolioId = portfolioId;
         this.deviation = deviation;
         this.portfolioType = portfolioType;
         this.allocations = allocations;
     }
 
-    public Integer getPortfolioId(){
+    public Long getPortfolioId(){
         return this.portfolioId;
     }
 
-    public void setPortfolioId(Integer portfolioId){
+    public void setPortfolioId(Long portfolioId){
         this.portfolioId = portfolioId;
     }
 

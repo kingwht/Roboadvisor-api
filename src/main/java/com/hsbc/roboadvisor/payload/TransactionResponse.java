@@ -13,7 +13,7 @@ public class TransactionResponse {
     private Integer status;
 
     @NotNull
-    private Integer portfolioId;
+    private Long portfolioId;
 
     @NotNull
     private Integer transactionId;
@@ -25,7 +25,7 @@ public class TransactionResponse {
         return status;
     }
 
-    public Integer getPortfolioId() {
+    public Long getPortfolioId() {
         return portfolioId;
     }
 

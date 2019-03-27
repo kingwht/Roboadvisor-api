@@ -32,7 +32,7 @@ public class Recommendation
     @Column(name = "portfolio_id")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ApiModelProperty(value = "The associated portfolio Id for the recommendation.")
-    private Integer portfolioId;
+    private Long portfolioId;
 
     @NotNull
     @Column(name = "transactions")
@@ -44,12 +44,12 @@ public class Recommendation
         //empty constructor
     }
 
-    public Recommendation(Integer portfolioId, List<Transaction> transactionList) {
+    public Recommendation(Long portfolioId, List<Transaction> transactionList) {
         this.portfolioId = portfolioId;
         this.transactionList = transactionList;
     }
 
-    public Recommendation(Integer recommendationId, Integer portfolioId, List<Transaction> transactionList) {
+    public Recommendation(Integer recommendationId, Long portfolioId, List<Transaction> transactionList) {
         this.recommendationId = recommendationId;
         this.portfolioId = portfolioId;
         this.transactionList = transactionList;
@@ -63,11 +63,11 @@ public class Recommendation
         this.recommendationId = recommendationId;
     }
 
-    public Integer getPortfolioId() {
+    public Long getPortfolioId() {
         return portfolioId;
     }
 
-    public void setPortfolioId(Integer portfolioId) {
+    public void setPortfolioId(Long portfolioId) {
         this.portfolioId = portfolioId;
     }
 

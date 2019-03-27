@@ -35,9 +35,8 @@ import com.hsbc.roboadvisor.RoboAdvisorApplication;
 public class PortfolioControllerIT
 		extends AbstractTestNGSpringContextTests {
 
-	String custId = "axlypv0e55";
-	String portfolioID = "9795213";
-	int porfolioIDInt = 9795213;
+	private static final String custId = "axlypv0e55";
+	private static final Long porfolioIDInt = 9795213L;
 	@LocalServerPort
 	private int              port;
 	@Autowired
@@ -233,7 +232,7 @@ public class PortfolioControllerIT
 		HashMap<Integer, JSONObject> holdingsBefore = hashJSONarrayWithPortID((JSONArray) beforePortfolioStates.opt("holdings"));
 
 		ResponseEntity<String> entity = this.restTemplate.exchange(createURLWithPort("/roboadvisor/portfolio/9795213/rebalance"), HttpMethod.POST, new HttpEntity<>(headers), String.class);
-		Assert.assertEquals(HttpStatus.OK, entity.getStatusCode());
+		Assert.assertEquals(entity.getStatusCode(), HttpStatus.OK);
 
 
 		JSONArray transactions = pullOutRecommendationTransacations(entity);
@@ -296,7 +295,7 @@ public class PortfolioControllerIT
 		return "http://localhost:" + port + uri;
 	}
 
-	private JSONObject getPortfolioStats(int portfolioID)  {
+	private JSONObject getPortfolioStats(Long portfolioID)  {
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("x-custid",custId);
 		ResponseEntity<String> entity = this.restTemplate.exchange(createURLWithPort("/roboadvisor/fundsystem/portfolios") , HttpMethod.GET,new HttpEntity<>(headers), String.class);

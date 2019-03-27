@@ -6,11 +6,10 @@ import org.springframework.stereotype.Repository;
 import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioPreference;
 
 @Repository
-public interface PortfolioRepository extends CrudRepository<PortfolioPreference, String>
+public interface PortfolioRepository extends CrudRepository<PortfolioPreference, Long>
 {
+    PortfolioPreference findByPortfolioId(Long portfolioId);
 
-    PortfolioPreference findByPortfolioId(Integer portfolioId);
-
-    Boolean existsByPortfolioId(Integer portfolioId);
+    Boolean existsByPortfolioId(Long portfolioId);
     
 }
