@@ -85,7 +85,7 @@ public class PortfolioController {
     @GetMapping("/{portfolioId}")
     public ResponseEntity<?> getPortfolioPreference(
         @RequestHeader(value = "x-custid") String customerId,
-        @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId) {
+        @ApiParam(value = "Portfolio ID", required = true) @PathVariable String portfolioId) {
 
         _logger.info("Getting portfolio id: {} for customer id: {}", portfolioId, customerId);
 
@@ -95,8 +95,8 @@ public class PortfolioController {
             );
         }
 
-        if (portfolioId == null) {
-            throw new BadRequestException("portfolioId cannot be null.");
+        if (portfolioId.equals("")) {
+            throw new BadRequestException("portfolioId cannot be empty.");
         }
 
         PortfolioPreference portfolio = portfolioService.findPreferenceByPortfolioId(portfolioId);
@@ -115,7 +115,7 @@ public class PortfolioController {
     @PostMapping("/{portfolioId}")
     public ResponseEntity<?> createPortfolioPreference(
         @RequestHeader(value = "x-custid") String customerId,
-        @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
+        @ApiParam(value = "Portfolio ID", required = true) @PathVariable String portfolioId,
         @Valid @RequestBody PortfolioRequest portfolioRequest) {
 
         _logger.info("Request to create portfolio with portfolio id: {} for customer id: {}", portfolioId, customerId);
@@ -139,7 +139,7 @@ public class PortfolioController {
     @PutMapping("/{portfolioId}/allocations")
     public ResponseEntity<?> setPortfolioAllocation(
             @RequestHeader(value = "x-custid") String customerId,
-            @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
+            @ApiParam(value = "Portfolio ID", required = true) @PathVariable String portfolioId,
             @Valid @RequestBody  List<Allocation> allocationList) {
 
         _logger.info("Request to update portfolio allocations with portfolio id: {} for customer id: {}", portfolioId, customerId);
@@ -174,7 +174,7 @@ public class PortfolioController {
     }
 
     // Checks if all funds in a given portfolio preference are part of the customer's portfolio
-    private void checkAllValidFundsInPortfolio(List<Allocation> allocationsList, String customerId, Integer portfolioId) {
+    private void checkAllValidFundsInPortfolio(List<Allocation> allocationsList, String customerId, String portfolioId) {
         List<Portfolio> customerPortfolioList = fundSystemRequestService.getPortfolios(customerId);
         List<Holding> portfolioFunds = customerPortfolioOrFail(customerPortfolioList,portfolioId).getHoldings();
 
@@ -194,7 +194,7 @@ public class PortfolioController {
     @PutMapping("/{portfolioId}/deviation")
     public ResponseEntity<?> setPortfolioDeviation(
             @RequestHeader(value = "x-custid") String customerId,
-            @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
+            @ApiParam(value = "Portfolio ID", required = true) @PathVariable String portfolioId,
             @Valid @RequestBody DeviationRequest deviationRequest) {
 
         _logger.info("Request to update portfolio deviation with portfolio id: {} for customer id: {}", portfolioId, customerId);
@@ -217,12 +217,12 @@ public class PortfolioController {
     @PostMapping("/{portfolioId}/rebalance")
     public ResponseEntity<?> createRecommendation(
             @RequestHeader(value = "x-custid") String customerId,
-            @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId){
+            @ApiParam(value = "Portfolio ID", required = true) @PathVariable String portfolioId){
 
         _logger.info("Request to create recommendation for portfolio id: {} for customer id: {}", portfolioId, customerId);
 
-        if (portfolioId == null) {
-            throw new BadRequestException("portfolioId cannot be null.");
+        if (portfolioId.equals("")) {
+            throw new BadRequestException("portfolioId cannot be empty.");
         }
 
         PortfolioPreference portfolioPreference = portfolioService.findPreferenceByPortfolioId(portfolioId);
@@ -241,7 +241,7 @@ public class PortfolioController {
         return ResponseEntity.ok(recommendation);
     }
 
-    private Portfolio customerPortfolioOrFail(List<Portfolio> customerPortfolioList, Integer portfolioId) {
+    private Portfolio customerPortfolioOrFail(List<Portfolio> customerPortfolioList, String portfolioId) {
         for (Portfolio portfolio : customerPortfolioList) {
             if (portfolio.getId().equals(portfolioId)) {
                 return portfolio;
@@ -281,7 +281,7 @@ public class PortfolioController {
     @PostMapping("/{portfolioId}/recommendation/{recommendationId}/execute")
     public ResponseEntity<?> executeRecommendation(
             @RequestHeader(value = "x-custid") String customerId,
-            @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
+            @ApiParam(value = "Portfolio ID", required = true) @PathVariable String portfolioId,
             @ApiParam(value = "Recommendation ID", required = true) @PathVariable Integer recommendationId) {
 
         _logger.info("Request to execute recommendation for recommendation id: {} for customer id: {}", recommendationId, customerId);
@@ -303,7 +303,9 @@ public class PortfolioController {
         try{
             _logger.info("Execute the recommendation: {} for customer id: {}", recommendationId, customerId);
             // Create the transaction request
-            TransactionRequest transactionRequest = new TransactionRequest(portfolioId, recommendation.getTransactions());
+            TransactionRequest transactionRequest = new TransactionRequest();
+            transactionRequest.setInstructions(recommendation.getTransactions());
+            transactionRequest.setPortfolioId(portfolioId);
 
             // Execute Transaction
             TransactionResponse transactionResponse = fundSystemRequestService
@@ -321,7 +323,7 @@ public class PortfolioController {
     @PutMapping("/{portfolioId}/recommendation/{recommendationId}/modify")
     public ResponseEntity<?> modifyRecommendation (
             @RequestHeader(value = "x-custid") String customerId,
-            @ApiParam(value = "Portfolio ID", required = true) @PathVariable Integer portfolioId,
+            @ApiParam(value = "Portfolio ID", required = true) @PathVariable String portfolioId,
             @ApiParam(value = "Recommendation ID", required = true) @PathVariable Integer recommendationId,
             @Valid @RequestBody List<Transaction> transactionList) {
 
@@ -355,9 +357,9 @@ public class PortfolioController {
 }
 
 
-   private void checkAllValidFundsInRecommendation(List<Transaction> transactions, String customerId, Integer portfolioID) {
+   private void checkAllValidFundsInRecommendation(List<Transaction> transactions, String customerId, String portfolioId) {
        List<Portfolio> customerPortfolioList = fundSystemRequestService.getPortfolios(customerId);
-       List<Holding> portfolioFunds = customerPortfolioOrFail(customerPortfolioList,portfolioID).getHoldings();
+       List<Holding> portfolioFunds = customerPortfolioOrFail(customerPortfolioList,portfolioId).getHoldings();
 
        Map<Integer, Boolean> mapPortfolioFunds = portfolioFundstoMap(portfolioFunds);
        for (Transaction transaction : transactions) {

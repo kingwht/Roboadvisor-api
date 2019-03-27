@@ -7,7 +7,7 @@ public class Portfolio implements Serializable
 {
     private String customerId;
 
-    private Integer id;
+    private String id;
 
     private List<Holding> holdings;
 
@@ -15,7 +15,7 @@ public class Portfolio implements Serializable
         //empty constructor
     }
 
-    public Portfolio(String customerId, Integer id, List<Holding> holdings) {
+    public Portfolio(String customerId, String id, List<Holding> holdings) {
         this.customerId = customerId;
         this.id = id;
         this.holdings = holdings;
@@ -29,11 +29,11 @@ public class Portfolio implements Serializable
         this.customerId = customerId;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 

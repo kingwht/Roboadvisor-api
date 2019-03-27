@@ -32,6 +32,8 @@ public class CreateRecommendationTest extends PortfolioPreferenceControllerTest 
     private List<Fund> customerFundList = new ArrayList<Fund>(){
         {add(fund);}};
 
+    private final String PORTFOLIO_ID = "testid123";
+
 
 
 
@@ -44,7 +46,7 @@ public class CreateRecommendationTest extends PortfolioPreferenceControllerTest 
 
     @Test
     public void MissingHeader() {
-        portfolio.setId(1);
+        portfolio.setId(PORTFOLIO_ID);
         try{
             mockMvc.perform(MockMvcRequestBuilders.post("/roboadvisor/portfolio/" + portfolio.getId() + "/rebalance"))
             .andExpect(MockMvcResultMatchers.status().isBadRequest());
@@ -57,7 +59,7 @@ public class CreateRecommendationTest extends PortfolioPreferenceControllerTest 
 
     @Test
     public void throwsIfCustomerIdIsNull()  {
-        portfolio.setId(1);
+        portfolio.setId(PORTFOLIO_ID);
         portfolio.setCustomerId(null);
         try{
             mockMvc.perform(MockMvcRequestBuilders.post("/roboadvisor/portfolio/" + portfolio.getId() + "/rebalance")
@@ -74,7 +76,7 @@ public class CreateRecommendationTest extends PortfolioPreferenceControllerTest 
 
     @Test
     public void throwsIfPortfolioIdIsNull() {
-        portfolio.setId(null);
+        portfolio.setId("");
         portfolio.setCustomerId("abc");
         try{
             mockMvc.perform(MockMvcRequestBuilders.post("/roboadvisor/portfolio/" + portfolio.getId() + "/rebalance")
@@ -87,9 +89,9 @@ public class CreateRecommendationTest extends PortfolioPreferenceControllerTest 
 
     @Test
     public void throwsIfPortfolioIdDoesNotExist(){
-        portfolio.setId(1);
+        portfolio.setId(PORTFOLIO_ID);
         portfolio.setCustomerId("abc");
-        portfolioPreference.setPortfolioId(1);
+        portfolioPreference.setPortfolioId(PORTFOLIO_ID);
 
         when(portfolioRepositoryService.findPreferenceByPortfolioId(portfolio.getId())).thenReturn(portfolioPreference);
         when(fundSystemRequestService.getPortfolios(portfolio.getCustomerId())).thenReturn(Collections.emptyList());
@@ -109,7 +111,7 @@ public class CreateRecommendationTest extends PortfolioPreferenceControllerTest 
 
     @Test//(expectedExceptions = ResourceNotFoundException.class)
     public void throwsIfPortfolioPreferenceDoesNotExist() {
-        portfolio.setId(1);
+        portfolio.setId(PORTFOLIO_ID);
         portfolio.setCustomerId("abc");
 
         when(portfolioRepositoryService.findPreferenceByPortfolioId(portfolio.getId())).thenReturn(null);
@@ -125,9 +127,9 @@ public class CreateRecommendationTest extends PortfolioPreferenceControllerTest 
 
     @Test
     public void normalRequest() {
-        portfolio.setId(1);
+        portfolio.setId(PORTFOLIO_ID);
         portfolio.setCustomerId("abc");
-        portfolioPreference.setPortfolioId(1);
+        portfolioPreference.setPortfolioId(PORTFOLIO_ID);
 
         when(portfolioRepositoryService.findPreferenceByPortfolioId(portfolio.getId())).thenReturn(portfolioPreference);
         when(fundSystemRequestService.getPortfolios(portfolio.getCustomerId())).thenReturn(customerPortfolioList);
