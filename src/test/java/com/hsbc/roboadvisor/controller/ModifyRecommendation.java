@@ -9,10 +9,12 @@ import com.hsbc.roboadvisor.model.Recommendation.Transaction;
 import com.hsbc.roboadvisor.model.Recommendation.TransactionType;
 import com.hsbc.roboadvisor.payload.TransactionResponse;
 import com.hsbc.roboadvisor.service.JpaJsonConverter;
+import org.neo4j.unsafe.impl.batchimport.input.MissingHeaderException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.bind.MissingRequestHeaderException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -31,6 +33,8 @@ public class ModifyRecommendation extends PortfolioPreferenceControllerTest {
     private Fund fund = new Fund();
     private Recommendation recommendation = new Recommendation();
     private TransactionResponse transactionResponse = new TransactionResponse();
+    private Transaction transaction = new Transaction();
+    private List<Transaction> transactions;
 
     private List<Portfolio> customerPortfolioList = new ArrayList<Portfolio>(){
         {add(portfolio);}};
@@ -42,7 +46,14 @@ public class ModifyRecommendation extends PortfolioPreferenceControllerTest {
 
     @BeforeClass
     public void setup() {
+
         super.setup();
+
+        transaction.setAction(TransactionType.buy);
+        transaction.setUnits(100);
+        transaction.setFundId(1);
+
+        transactions = new ArrayList<Transaction>(){{add(transaction);}};
     }
 
     @Test
@@ -52,12 +63,34 @@ public class ModifyRecommendation extends PortfolioPreferenceControllerTest {
         recommendation.setRecommendationId(1);
 
         try{
-            mockMvc.perform(MockMvcRequestBuilders.post("/roboadvisor/portfolio/" + portfolio.getId()
-                    + "/recommendation/" + recommendation.getRecommendationId() + "/execute"))
+            mockMvc.perform(MockMvcRequestBuilders.put("/roboadvisor/portfolio/" + portfolio.getId()
+                    + "/recommendation/" + recommendation.getRecommendationId() + "/modify")
+                    .content(jpaJsonConverter.convertToDatabaseColumn(transactions))
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
                     .andExpect(MockMvcResultMatchers.status().isBadRequest());
             //fail("Request should have failed");
         } catch (Exception e) {
             if(e.getClass() != MissingRequestHeaderException.class)
+                fail("Received unexpected exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void MissingRequestBody() {
+        portfolio.setId(1);
+        portfolio.setCustomerId("abc");
+        recommendation.setRecommendationId(1);
+
+        try{
+            mockMvc.perform(MockMvcRequestBuilders.put("/roboadvisor/portfolio/" + portfolio.getId()
+                    + "/recommendation/" + recommendation.getRecommendationId() + "/modify")
+                    .header("x-custid", portfolio.getCustomerId())
+            )
+                    .andExpect(MockMvcResultMatchers.status().isBadRequest());
+            //fail("Request should have failed");
+        } catch (Exception e) {
+            if(e.getClass() != MissingServletRequestParameterException.class)
                 fail("Received unexpected exception: " + e.getMessage());
         }
     }
@@ -69,9 +102,12 @@ public class ModifyRecommendation extends PortfolioPreferenceControllerTest {
         portfolio.setCustomerId("abc");
         recommendation.setRecommendationId(null);
         try{
-            mockMvc.perform(MockMvcRequestBuilders.post("/roboadvisor/portfolio/" + portfolio.getId()
-                    + "/recommendation/" + recommendation.getRecommendationId() + "/execute")
-                    .header("x-custid", portfolio.getCustomerId()))
+            mockMvc.perform(MockMvcRequestBuilders.put("/roboadvisor/portfolio/" + portfolio.getId()
+                    + "/recommendation/" + recommendation.getRecommendationId() + "/modify")
+                    .header("x-custid", portfolio.getCustomerId())
+                    .content(jpaJsonConverter.convertToDatabaseColumn(transactions))
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
                     .andExpect(MockMvcResultMatchers.status().isBadRequest());
         } catch (Exception e) {
             fail("Received unexpected exception: " + e.getMessage());
@@ -91,9 +127,12 @@ public class ModifyRecommendation extends PortfolioPreferenceControllerTest {
                 .thenReturn(recommendation);
 
         try{
-            mockMvc.perform(MockMvcRequestBuilders.post("/roboadvisor/portfolio/" + portfolio.getId()
-                    + "/recommendation/" + recommendation.getRecommendationId() + "/execute")
-                    .header("x-custid", portfolio.getCustomerId()))
+            mockMvc.perform(MockMvcRequestBuilders.put("/roboadvisor/portfolio/" + portfolio.getId()
+                    + "/recommendation/" + recommendation.getRecommendationId() + "/modify")
+                    .header("x-custid", portfolio.getCustomerId())
+                    .content(jpaJsonConverter.convertToDatabaseColumn(transactions))
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
                     .andExpect(MockMvcResultMatchers.status().isNotFound());
         } catch (Exception e){
             fail("No Exception should be thrown");
@@ -108,9 +147,12 @@ public class ModifyRecommendation extends PortfolioPreferenceControllerTest {
         when(portfolioRepositoryService.findPreferenceByPortfolioId(portfolio.getId())).thenReturn(null);
 
         try{
-            mockMvc.perform(MockMvcRequestBuilders.post("/roboadvisor/portfolio/" + portfolio.getId()
-                    + "/recommendation/" + recommendation.getRecommendationId() + "/execute")
-                    .header("x-custid", portfolio.getCustomerId()))
+            mockMvc.perform(MockMvcRequestBuilders.put("/roboadvisor/portfolio/" + portfolio.getId()
+                    + "/recommendation/" + recommendation.getRecommendationId() + "/modify")
+                    .header("x-custid", portfolio.getCustomerId())
+                    .content(jpaJsonConverter.convertToDatabaseColumn(transactions))
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
                     .andExpect(MockMvcResultMatchers.status().isNotFound());
         } catch (Exception e){
             fail("No Exception should be thrown");
@@ -129,9 +171,12 @@ public class ModifyRecommendation extends PortfolioPreferenceControllerTest {
                 .thenReturn(null);
 
         try{
-            mockMvc.perform(MockMvcRequestBuilders.post("/roboadvisor/portfolio/" + portfolio.getId()
-                    + "/recommendation/" + recommendation.getRecommendationId() + "/execute")
-                    .header("x-custid", portfolio.getCustomerId()))
+            mockMvc.perform(MockMvcRequestBuilders.put("/roboadvisor/portfolio/" + portfolio.getId()
+                    + "/recommendation/" + recommendation.getRecommendationId() + "/modify")
+                    .header("x-custid", portfolio.getCustomerId())
+                    .content(jpaJsonConverter.convertToDatabaseColumn(transactions))
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
                     .andExpect(MockMvcResultMatchers.status().isNotFound());
         } catch (Exception e){
             fail("No Exception should be thrown");
@@ -153,11 +198,7 @@ public class ModifyRecommendation extends PortfolioPreferenceControllerTest {
         recommendation.setRecommendationId(1);
         Recommendation recommendation2 = new Recommendation();
         recommendation.setRecommendationId(1);
-        Transaction transaction = new Transaction();
-        transaction.setAction(TransactionType.buy);
-        transaction.setUnits(100);
-        transaction.setFundId(1);
-        List<Transaction> transactions = new ArrayList<Transaction>(){{add(transaction);}};
+
         recommendation2.setTransactions(transactions);
         recommendation2.setRecommendationId(1);
 
