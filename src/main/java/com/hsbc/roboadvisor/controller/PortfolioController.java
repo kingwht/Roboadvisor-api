@@ -35,6 +35,7 @@ import com.hsbc.roboadvisor.model.Recommendation.Recommendation;
 import com.hsbc.roboadvisor.model.Recommendation.Transaction;
 import com.hsbc.roboadvisor.payload.DeviationRequest;
 import com.hsbc.roboadvisor.payload.FundRecommendationRequest;
+import com.hsbc.roboadvisor.payload.PortfolioPreferenceUpdateRequest;
 import com.hsbc.roboadvisor.payload.PortfolioRequest;
 import com.hsbc.roboadvisor.payload.TransactionRequest;
 import com.hsbc.roboadvisor.payload.TransactionResponse;
@@ -78,9 +79,9 @@ public class PortfolioController {
 
     @ApiOperation(value = "Get portfolio asset allocation and deviation preference.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully retrieved portfolio preference.", response = PortfolioPreference.class),
-            @ApiResponse(code = 400, message = "Invalid Portfolio ID."),
-            @ApiResponse(code = 404, message = "No portfolio preference found.")
+        @ApiResponse(code = 200, message = "Successfully retrieved portfolio preference.", response = PortfolioPreference.class),
+        @ApiResponse(code = 400, message = "Invalid Portfolio ID."),
+        @ApiResponse(code = 404, message = "No portfolio preference found.")
     })
     @GetMapping("/{portfolioId}")
     public ResponseEntity<?> getPortfolioPreference(
@@ -109,8 +110,8 @@ public class PortfolioController {
 
     @ApiOperation(value = "Create a portfolio asset allocation and deviation preference.")
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Successfully created portfolio asset allocation and deviation preferences."),
-            @ApiResponse(code = 400, message = "Invalid post portfolio preference request.")
+        @ApiResponse(code = 201, message = "Successfully created portfolio asset allocation and deviation preferences."),
+        @ApiResponse(code = 400, message = "Invalid post portfolio preference request.")
     })
     @PostMapping("/{portfolioId}")
     public ResponseEntity<?> createPortfolioPreference(
@@ -131,16 +132,46 @@ public class PortfolioController {
         return ResponseEntity.created(location).build();
     }
 
+
+    @ApiOperation(value = "Update a portfolio preference deviation and allocation.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, message = "Successfully updated portfolio preferences."),
+        @ApiResponse(code = 400, message = "Invalid portfolio preference request.")
+    })
+    @PutMapping("/{portfolioId}")
+    public ResponseEntity<?> updatePortfolioPreference(@RequestHeader(value = "x-custid") String customerId, @ApiParam(value = "Portfolio ID", required = true) @PathVariable String portfolioId,
+            @Valid @RequestBody PortfolioPreferenceUpdateRequest updateRequest) {
+
+        _logger.info("Updating portfolio preference request customer id: {}, portfolio {}", customerId, portfolioId);
+
+        if (customerId == null || customerId.isEmpty()) {
+            throw new BadRequestException(
+                    String.format("customerId cannot be null or empty.  Given: %s", customerId)
+            );
+        }
+
+        PortfolioPreference portfolio = portfolioService.findPreferenceByPortfolioId(portfolioId);
+        if (portfolio == null) {
+            throw new ResourceNotFoundException("Portfolio Preference", "PortfolioId", portfolioId);
+        }
+
+        allocationListValidOrFail(updateRequest.getAllocations(), portfolio.getPortfolioType());
+        checkAllValidFundsInPortfolio(updateRequest.getAllocations(), customerId, portfolioId);
+
+        PortfolioPreference result = this.portfolioService.updatePortfolioPreference(portfolioId, updateRequest);
+        return ResponseEntity.ok(result);
+    }
+
     @ApiOperation(value = "Update a portfolio preference allocation.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully updated the portfolio's preferred allocations."),
-            @ApiResponse(code = 404, message = "Invalid Portfolio ID.")
+        @ApiResponse(code = 200, message = "Successfully updated the portfolio's preferred allocations."),
+        @ApiResponse(code = 404, message = "Invalid Portfolio ID.")
     })
     @PutMapping("/{portfolioId}/allocations")
     public ResponseEntity<?> setPortfolioAllocation(
-            @RequestHeader(value = "x-custid") String customerId,
-            @ApiParam(value = "Portfolio ID", required = true) @PathVariable String portfolioId,
-            @Valid @RequestBody  List<Allocation> allocationList) {
+        @RequestHeader(value = "x-custid") String customerId,
+        @ApiParam(value = "Portfolio ID", required = true) @PathVariable String portfolioId,
+        @Valid @RequestBody  List<Allocation> allocationList) {
 
         _logger.info("Request to update portfolio allocations with portfolio id: {} for customer id: {}", portfolioId, customerId);
 
@@ -153,8 +184,8 @@ public class PortfolioController {
 
         checkAllValidFundsInPortfolio(allocationList, customerId, portfolioId);
 
-        this.portfolioService.updateAllocationsByPortfolioId(portfolioId, allocationList);
-        return ResponseEntity.ok(allocationList);
+        PortfolioPreference result = this.portfolioService.updateAllocationsByPortfolioId(portfolioId, allocationList);
+        return ResponseEntity.ok(result.getAllocations());
     }
 
     private void allocationListValidOrFail(List<Allocation> allocationList, PortfolioType portfolioType) {
@@ -188,14 +219,14 @@ public class PortfolioController {
 
     @ApiOperation(value = "Update a portfolio deviation percentage.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully updated the portfolio's deviation."),
-            @ApiResponse(code = 404, message = "Invalid Portfolio ID.")
+        @ApiResponse(code = 200, message = "Successfully updated the portfolio's deviation."),
+        @ApiResponse(code = 404, message = "Invalid Portfolio ID.")
     })
     @PutMapping("/{portfolioId}/deviation")
     public ResponseEntity<?> setPortfolioDeviation(
-            @RequestHeader(value = "x-custid") String customerId,
-            @ApiParam(value = "Portfolio ID", required = true) @PathVariable String portfolioId,
-            @Valid @RequestBody DeviationRequest deviationRequest) {
+        @RequestHeader(value = "x-custid") String customerId,
+        @ApiParam(value = "Portfolio ID", required = true) @PathVariable String portfolioId,
+        @Valid @RequestBody DeviationRequest deviationRequest) {
 
         _logger.info("Request to update portfolio deviation with portfolio id: {} for customer id: {}", portfolioId, customerId);
 
@@ -211,13 +242,13 @@ public class PortfolioController {
 
     @ApiOperation(value = "Create a rebalance recommendation.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully created rebalance recommendation."),
-            @ApiResponse(code = 400, message = "Invalid post recommendation preference request.")
+        @ApiResponse(code = 200, message = "Successfully created rebalance recommendation."),
+        @ApiResponse(code = 400, message = "Invalid post recommendation preference request.")
     })
     @PostMapping("/{portfolioId}/rebalance")
     public ResponseEntity<?> createRecommendation(
-            @RequestHeader(value = "x-custid") String customerId,
-            @ApiParam(value = "Portfolio ID", required = true) @PathVariable String portfolioId){
+        @RequestHeader(value = "x-custid") String customerId,
+        @ApiParam(value = "Portfolio ID", required = true) @PathVariable String portfolioId){
 
         _logger.info("Request to create recommendation for portfolio id: {} for customer id: {}", portfolioId, customerId);
 
@@ -252,12 +283,12 @@ public class PortfolioController {
 
     @ApiOperation(value = "Create a list of suggested transactions for the given category and budget.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully returned ranked list of recommended funds to purchase.")
+        @ApiResponse(code = 200, message = "Successfully returned ranked list of recommended funds to purchase.")
     })
     @PostMapping("/rebalance/ranking")
     public ResponseEntity<?> createCategoricalRanking(
-            @RequestHeader(value = "x-custid") String customerId,
-            @Valid @RequestBody FundRecommendationRequest fundRecommendationRequest) {
+        @RequestHeader(value = "x-custid") String customerId,
+        @Valid @RequestBody FundRecommendationRequest fundRecommendationRequest) {
 
         if (customerId == null || customerId.isEmpty()) {
             throw new BadRequestException(
@@ -276,13 +307,13 @@ public class PortfolioController {
 
     @ApiOperation(value = "Execute the rebalance recommendation.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully executed the rebalance recommendation.")
+        @ApiResponse(code = 200, message = "Successfully executed the rebalance recommendation.")
     })
     @PostMapping("/{portfolioId}/recommendation/{recommendationId}/execute")
     public ResponseEntity<?> executeRecommendation(
-            @RequestHeader(value = "x-custid") String customerId,
-            @ApiParam(value = "Portfolio ID", required = true) @PathVariable String portfolioId,
-            @ApiParam(value = "Recommendation ID", required = true) @PathVariable Integer recommendationId) {
+        @RequestHeader(value = "x-custid") String customerId,
+        @ApiParam(value = "Portfolio ID", required = true) @PathVariable String portfolioId,
+        @ApiParam(value = "Recommendation ID", required = true) @PathVariable Integer recommendationId) {
 
         _logger.info("Request to execute recommendation for recommendation id: {} for customer id: {}", recommendationId, customerId);
 
@@ -318,14 +349,14 @@ public class PortfolioController {
 
     @ApiOperation(value = "Update the transactions in the rebalance recommendation.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully executed the rebalance recommendation.")
+        @ApiResponse(code = 200, message = "Successfully executed the rebalance recommendation.")
     })
     @PutMapping("/{portfolioId}/recommendation/{recommendationId}/modify")
     public ResponseEntity<?> modifyRecommendation (
-            @RequestHeader(value = "x-custid") String customerId,
-            @ApiParam(value = "Portfolio ID", required = true) @PathVariable String portfolioId,
-            @ApiParam(value = "Recommendation ID", required = true) @PathVariable Integer recommendationId,
-            @Valid @RequestBody List<Transaction> transactionList) {
+        @RequestHeader(value = "x-custid") String customerId,
+        @ApiParam(value = "Portfolio ID", required = true) @PathVariable String portfolioId,
+        @ApiParam(value = "Recommendation ID", required = true) @PathVariable Integer recommendationId,
+        @Valid @RequestBody List<Transaction> transactionList) {
 
         _logger.info("Request to update recommendation for recommendation id: {} for customer id: {}", recommendationId, customerId);
 
