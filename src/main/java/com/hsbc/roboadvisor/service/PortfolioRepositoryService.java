@@ -10,6 +10,7 @@ import com.hsbc.roboadvisor.exception.BadRequestException;
 import com.hsbc.roboadvisor.model.PortfolioPreference.Allocation;
 import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioPreference;
 import com.hsbc.roboadvisor.payload.DeviationRequest;
+import com.hsbc.roboadvisor.payload.PortfolioPreferenceUpdateRequest;
 import com.hsbc.roboadvisor.payload.PortfolioRequest;
 import com.hsbc.roboadvisor.repository.PortfolioRepository;
 
@@ -36,6 +37,15 @@ public class PortfolioRepositoryService
         return this.portfolioRepository.save(portfolio);
     }
 
+    public PortfolioPreference updatePortfolioPreference(String portfolioId, PortfolioPreferenceUpdateRequest updateRequest) {
+        totalPercentIs100OrFail(updateRequest.getAllocations());
+        PortfolioPreference portfolio = this.portfolioRepository.findByPortfolioId(portfolioId);
+
+        portfolio.setAllocations(updateRequest.getAllocations());
+        portfolio.setDeviation(updateRequest.getDeviation());
+
+        return this.portfolioRepository.save(portfolio);
+    }
 
     public PortfolioPreference updateDeviationByPortfolioId(String portfolioId, DeviationRequest deviationRequest) {
         PortfolioPreference portfolio = this.portfolioRepository.findByPortfolioId(portfolioId);
