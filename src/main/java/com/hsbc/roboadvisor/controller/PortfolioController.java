@@ -127,7 +127,7 @@ public class PortfolioController {
 
         if (portfolioRequest.getType() == PortfolioType.fund) {
             checkAllValidFundsInPortfolio(portfolioRequest.getAllocations(), customerId, portfolioId);
-        } 
+        }
 
         PortfolioPreference result = portfolioService.savePreference(portfolioId, portfolioRequest);
 
@@ -161,7 +161,10 @@ public class PortfolioController {
         }
 
         allocationListValidOrFail(updateRequest.getAllocations(), portfolio.getPortfolioType());
-        checkAllValidFundsInPortfolio(updateRequest.getAllocations(), customerId, portfolioId);
+
+        if (portfolio.getPortfolioType() == PortfolioType.fund) {
+            checkAllValidFundsInPortfolio(updateRequest.getAllocations(), customerId, portfolioId);
+        }
 
         PortfolioPreference result = this.portfolioService.updatePortfolioPreference(portfolioId, updateRequest);
         return ResponseEntity.ok(result);
