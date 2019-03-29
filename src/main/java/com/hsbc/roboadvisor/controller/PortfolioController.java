@@ -190,7 +190,9 @@ public class PortfolioController {
 
         allocationListValidOrFail(allocationList, portfolio.getPortfolioType());
 
-        checkAllValidFundsInPortfolio(allocationList, customerId, portfolioId);
+        if (portfolio.getPortfolioType() == PortfolioType.fund) {
+            checkAllValidFundsInPortfolio(allocationList, customerId, portfolioId);
+        }
 
         PortfolioPreference result = this.portfolioService.updateAllocationsByPortfolioId(portfolioId, allocationList);
         return ResponseEntity.ok(result.getAllocations());
