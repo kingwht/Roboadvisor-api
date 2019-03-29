@@ -3,8 +3,10 @@ package com.hsbc.roboadvisor.controller;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -122,7 +124,10 @@ public class PortfolioController {
         _logger.info("Request to create portfolio with portfolio id: {} for customer id: {}", portfolioId, customerId);
 
         allocationListValidOrFail(portfolioRequest.getAllocations(), portfolioRequest.getType());
-        checkAllValidFundsInPortfolio(portfolioRequest.getAllocations(), customerId, portfolioId);
+
+        if (portfolioRequest.getType() == PortfolioType.fund) {
+            checkAllValidFundsInPortfolio(portfolioRequest.getAllocations(), customerId, portfolioId);
+        } 
 
         PortfolioPreference result = portfolioService.savePreference(portfolioId, portfolioRequest);
 
@@ -189,11 +194,13 @@ public class PortfolioController {
     }
 
     private void allocationListValidOrFail(List<Allocation> allocationList, PortfolioType portfolioType) {
+        Set<Integer> allocationsSet = new HashSet<>();
+
         for (Allocation allocation : allocationList) {
             if (portfolioType.equals(PortfolioType.category) && allocation.getFundId() != null) {
-                throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
+                throw new BadRequestException("Only one portfolio type of Category or Fund Id can be set. Please check again.");
             }else if (portfolioType.equals(PortfolioType.fund) && allocation.getCategory() != null){
-                throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
+                throw new BadRequestException("Only one portfolio type of Category or Fund Id can be set. Please check again.");
             }
 
             if (allocation.getCategory() == null && allocation.getFundId() == null) {
@@ -201,6 +208,12 @@ public class PortfolioController {
             } else if (allocation.getCategory() != null && allocation.getFundId() != null) {
                 throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
             }
+
+            allocationsSet.add(portfolioType == PortfolioType.fund ? allocation.getFundId(): allocation.getCategory());
+        }
+
+        if (allocationsSet.size() != allocationList.size()) {
+            throw new BadRequestException("Non-unique allocation entries. Please check again.");
         }
     }
 
