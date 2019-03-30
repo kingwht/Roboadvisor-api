@@ -3,8 +3,10 @@ package com.hsbc.roboadvisor.controller;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -31,6 +33,7 @@ import com.hsbc.roboadvisor.model.Portfolio.Portfolio;
 import com.hsbc.roboadvisor.model.PortfolioPreference.Allocation;
 import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioPreference;
 import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioType;
+import com.hsbc.roboadvisor.model.Recommendation.CategoryRecommendation;
 import com.hsbc.roboadvisor.model.Recommendation.Recommendation;
 import com.hsbc.roboadvisor.model.Recommendation.Transaction;
 import com.hsbc.roboadvisor.payload.DeviationRequest;
@@ -122,7 +125,10 @@ public class PortfolioController {
         _logger.info("Request to create portfolio with portfolio id: {} for customer id: {}", portfolioId, customerId);
 
         allocationListValidOrFail(portfolioRequest.getAllocations(), portfolioRequest.getType());
-        checkAllValidFundsInPortfolio(portfolioRequest.getAllocations(), customerId, portfolioId);
+
+        if (portfolioRequest.getType() == PortfolioType.fund) {
+            checkAllValidFundsInPortfolio(portfolioRequest.getAllocations(), customerId, portfolioId);
+        }
 
         PortfolioPreference result = portfolioService.savePreference(portfolioId, portfolioRequest);
 
@@ -156,7 +162,10 @@ public class PortfolioController {
         }
 
         allocationListValidOrFail(updateRequest.getAllocations(), portfolio.getPortfolioType());
-        checkAllValidFundsInPortfolio(updateRequest.getAllocations(), customerId, portfolioId);
+
+        if (portfolio.getPortfolioType() == PortfolioType.fund) {
+            checkAllValidFundsInPortfolio(updateRequest.getAllocations(), customerId, portfolioId);
+        }
 
         PortfolioPreference result = this.portfolioService.updatePortfolioPreference(portfolioId, updateRequest);
         return ResponseEntity.ok(result);
@@ -182,18 +191,22 @@ public class PortfolioController {
 
         allocationListValidOrFail(allocationList, portfolio.getPortfolioType());
 
-        checkAllValidFundsInPortfolio(allocationList, customerId, portfolioId);
+        if (portfolio.getPortfolioType() == PortfolioType.fund) {
+            checkAllValidFundsInPortfolio(allocationList, customerId, portfolioId);
+        }
 
         PortfolioPreference result = this.portfolioService.updateAllocationsByPortfolioId(portfolioId, allocationList);
         return ResponseEntity.ok(result.getAllocations());
     }
 
     private void allocationListValidOrFail(List<Allocation> allocationList, PortfolioType portfolioType) {
+        Set<Integer> allocationsSet = new HashSet<>();
+
         for (Allocation allocation : allocationList) {
             if (portfolioType.equals(PortfolioType.category) && allocation.getFundId() != null) {
-                throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
+                throw new BadRequestException("Only one portfolio type of Category or Fund Id can be set. Please check again.");
             }else if (portfolioType.equals(PortfolioType.fund) && allocation.getCategory() != null){
-                throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
+                throw new BadRequestException("Only one portfolio type of Category or Fund Id can be set. Please check again.");
             }
 
             if (allocation.getCategory() == null && allocation.getFundId() == null) {
@@ -201,6 +214,12 @@ public class PortfolioController {
             } else if (allocation.getCategory() != null && allocation.getFundId() != null) {
                 throw new BadRequestException("Only one Category or Fund Id can be set. Please check again.");
             }
+
+            allocationsSet.add(portfolioType == PortfolioType.fund ? allocation.getFundId(): allocation.getCategory());
+        }
+
+        if (allocationsSet.size() != allocationList.size()) {
+            throw new BadRequestException("Non-unique allocation entries. Please check again.");
         }
     }
 
@@ -266,10 +285,18 @@ public class PortfolioController {
 
         Portfolio portfolio = customerPortfolioOrFail(customerPortfolioList, portfolioId);
 
+        if (portfolioPreference.getPortfolioType() == PortfolioType.category) {
+            CategoryRecommendation categoryRecommendation = this.recommendationRepositoryService
+                    .saveCategoryRecommentation(portfolio, customerFundList, portfolioPreference);
+
+            return ResponseEntity.ok(categoryRecommendation);
+        }
+
         Recommendation recommendation = this.recommendationRepositoryService.saveRecommendation(portfolio,
-                customerFundList,portfolioPreference);
+                customerFundList, portfolioPreference);
 
         return ResponseEntity.ok(recommendation);
+
     }
 
     private Portfolio customerPortfolioOrFail(List<Portfolio> customerPortfolioList, String portfolioId) {
