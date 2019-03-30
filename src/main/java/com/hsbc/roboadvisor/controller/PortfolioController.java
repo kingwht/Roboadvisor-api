@@ -33,6 +33,7 @@ import com.hsbc.roboadvisor.model.Portfolio.Portfolio;
 import com.hsbc.roboadvisor.model.PortfolioPreference.Allocation;
 import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioPreference;
 import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioType;
+import com.hsbc.roboadvisor.model.Recommendation.CategoryRecommendation;
 import com.hsbc.roboadvisor.model.Recommendation.Recommendation;
 import com.hsbc.roboadvisor.model.Recommendation.Transaction;
 import com.hsbc.roboadvisor.payload.DeviationRequest;
@@ -284,10 +285,18 @@ public class PortfolioController {
 
         Portfolio portfolio = customerPortfolioOrFail(customerPortfolioList, portfolioId);
 
+        if (portfolioPreference.getPortfolioType() == PortfolioType.category) {
+            CategoryRecommendation categoryRecommendation = this.recommendationRepositoryService
+                    .saveCategoryRecommentation(portfolio, customerFundList, portfolioPreference);
+
+            return ResponseEntity.ok(categoryRecommendation);
+        }
+
         Recommendation recommendation = this.recommendationRepositoryService.saveRecommendation(portfolio,
-                customerFundList,portfolioPreference);
+                customerFundList, portfolioPreference);
 
         return ResponseEntity.ok(recommendation);
+
     }
 
     private Portfolio customerPortfolioOrFail(List<Portfolio> customerPortfolioList, String portfolioId) {
