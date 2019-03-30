@@ -42,8 +42,6 @@ public class CreateRecommendationTest extends PortfolioPreferenceControllerTest 
         super.setup();
     }
 
-    // Assume the customerId is not null, and the header exists,
-
     @Test
     public void MissingHeader() {
         portfolio.setId(PORTFOLIO_ID);
@@ -148,4 +146,5 @@ public class CreateRecommendationTest extends PortfolioPreferenceControllerTest 
             fail("Received unexpected exception: " + e.getMessage());
         }
     }
+
 }

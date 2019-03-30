@@ -354,6 +354,8 @@ public class PortfolioController {
             throw new ResourceNotFoundException("Recommendation", "Recommendation Id", recommendationId);
         }
 
+        checkAllValidFundsInRecommendation(recommendation.getTransactions(), customerId, portfolioId);
+
         if (recommendation.getTransactions().size() == 0) {
             throw new EmptyTransactionException("Recommendation transaction cannot be empty.");
         }
