@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -57,6 +58,9 @@ public class ModifyRecommendationTest
         transaction.setFundId(1);
 
         transactions = new ArrayList<Transaction>(){{add(transaction);}};
+
+        portfolioPreference.setPortfolioType(PortfolioType.fund);
+
     }
 
     @Test

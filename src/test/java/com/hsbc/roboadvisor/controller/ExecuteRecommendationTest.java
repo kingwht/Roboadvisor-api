@@ -4,6 +4,7 @@ import com.hsbc.roboadvisor.model.Fund.Fund;
 import com.hsbc.roboadvisor.model.Portfolio.Holding;
 import com.hsbc.roboadvisor.model.Portfolio.Portfolio;
 import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioPreference;
+import com.hsbc.roboadvisor.model.PortfolioPreference.PortfolioType;
 import com.hsbc.roboadvisor.model.Recommendation.Recommendation;
 import com.hsbc.roboadvisor.model.Recommendation.Transaction;
 import com.hsbc.roboadvisor.model.Recommendation.TransactionType;
@@ -40,7 +41,9 @@ public class ExecuteRecommendationTest
 
     @BeforeClass
     public void setup() {
+
         super.setup();
+        portfolioPreference.setPortfolioType(PortfolioType.fund);
     }
 
     @Test
