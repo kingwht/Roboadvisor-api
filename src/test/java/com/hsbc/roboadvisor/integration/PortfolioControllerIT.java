@@ -5,7 +5,6 @@
 package com.hsbc.roboadvisor.integration;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -248,31 +247,8 @@ public class PortfolioControllerIT
 		}
 		entity = this.restTemplate.exchange(createURLWithPort("/roboadvisor/portfolio/9795213/recommendation/" + String.valueOf(recommendID) + "/execute"), HttpMethod.POST, new HttpEntity<>(headers), String.class);
 		Assert.assertEquals(entity.getStatusCode(), HttpStatus.OK);
-		// Check after Transaction Executed
-		JSONObject afterPortfolioStates = getPortfolioStats(porfolioIDInt);
-		Assert.assertTrue(afterPortfolioStates.names() != null);
-		HashMap<Integer, JSONObject> holdingsAfter = hashJSONarrayWithPortID((JSONArray) afterPortfolioStates.opt("holdings"));
-		HashMap<Integer, JSONObject> transMap = hashJSONarrayWithPortID(transactions);
-		Assert.assertEquals(holdingsBefore.size(), holdingsAfter.size());
-
-
-		for (Map.Entry<Integer, JSONObject> entry : holdingsBefore.entrySet()) {
-			Integer key = entry.getKey();
-			int beforeUnits = entry.getValue().optInt("units");
-			int afterUnits = holdingsAfter.get(key).optInt("units");
-			int beforeBal = (entry.getValue().optJSONObject("balance")).optInt("amount");
-			int afterBal = (holdingsAfter.get(key).optJSONObject("balance")).optInt("amount");
-			int transUnits = 0;
-			if (transMap.get(key) != null) {
-				transUnits = transMap.get(key).optInt("units");
-			}
-			if (transMap.get(entry.getKey()).opt("action").equals("sell")) {
-				Assert.assertEquals(afterUnits, beforeUnits - transUnits);
-			} else {
-				Assert.assertEquals(afterUnits, beforeUnits + transUnits);
-			}
-		}
 	}
+	
 	@Test(dependsOnMethods={"testPOSTRecommendationAndExecute"})
 	public void testmodifyRecommendation() throws JSONException {
 		HttpHeaders headers = new HttpHeaders();
