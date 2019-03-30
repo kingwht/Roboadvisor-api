@@ -22,7 +22,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
-public class ExecuteRecommendation extends PortfolioPreferenceControllerTest {
+public class ExecuteRecommendationTest
+        extends PortfolioPreferenceControllerTest {
     private PortfolioPreference portfolioPreference = new PortfolioPreference();
     private Portfolio portfolio = new Portfolio();
     private Fund fund = new Fund();

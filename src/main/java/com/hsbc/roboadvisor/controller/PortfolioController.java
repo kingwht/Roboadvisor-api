@@ -354,7 +354,9 @@ public class PortfolioController {
             throw new ResourceNotFoundException("Recommendation", "Recommendation Id", recommendationId);
         }
 
-        checkAllValidFundsInRecommendation(recommendation.getTransactions(), customerId, portfolioId);
+        if (portfolioPreference.getPortfolioType().equals(PortfolioType.fund)) {
+            checkAllValidFundsInRecommendation(recommendation.getTransactions(), customerId, portfolioId);
+        }
 
         if (recommendation.getTransactions().size() == 0) {
             throw new EmptyTransactionException("Recommendation transaction cannot be empty.");
@@ -399,8 +401,9 @@ public class PortfolioController {
             throw new ResourceNotFoundException("Recommendation", "Recommendation Id", recommendationId);
         }
 
-       checkAllValidFundsInRecommendation(transactionList, customerId, portfolioId);
-
+        if (portfolioPreference.getPortfolioType().equals(PortfolioType.fund)) {
+            checkAllValidFundsInRecommendation(transactionList, customerId, portfolioId);
+        }
 
         Recommendation result = this.recommendationRepositoryService.updateRecommendationTransactions(
                 recommendation, transactionList);

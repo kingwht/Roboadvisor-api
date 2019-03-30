@@ -1,5 +1,23 @@
 package com.hsbc.roboadvisor.controller;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.bind.MissingRequestHeaderException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import com.hsbc.roboadvisor.model.Fund.Fund;
 import com.hsbc.roboadvisor.model.Portfolio.Holding;
 import com.hsbc.roboadvisor.model.Portfolio.Portfolio;
@@ -9,24 +27,9 @@ import com.hsbc.roboadvisor.model.Recommendation.Transaction;
 import com.hsbc.roboadvisor.model.Recommendation.TransactionType;
 import com.hsbc.roboadvisor.payload.TransactionResponse;
 import com.hsbc.roboadvisor.service.JpaJsonConverter;
-import org.neo4j.unsafe.impl.batchimport.input.MissingHeaderException;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.web.bind.MissingRequestHeaderException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.*;
-
-public class ModifyRecommendation extends PortfolioPreferenceControllerTest {
+public class ModifyRecommendationTest
+        extends PortfolioPreferenceControllerTest {
     private JpaJsonConverter jpaJsonConverter = new JpaJsonConverter();
     private PortfolioPreference portfolioPreference = new PortfolioPreference();
     private Portfolio portfolio = new Portfolio();
