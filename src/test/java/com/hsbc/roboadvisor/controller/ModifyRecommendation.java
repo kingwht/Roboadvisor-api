@@ -58,7 +58,7 @@ public class ModifyRecommendation extends PortfolioPreferenceControllerTest {
 
     @Test
     public void MissingHeader() {
-        portfolio.setId(1);
+        portfolio.setId("1");
         portfolio.setCustomerId("abc");
         recommendation.setRecommendationId(1);
 
@@ -78,7 +78,7 @@ public class ModifyRecommendation extends PortfolioPreferenceControllerTest {
 
     @Test
     public void MissingRequestBody() {
-        portfolio.setId(1);
+        portfolio.setId("1");
         portfolio.setCustomerId("abc");
         recommendation.setRecommendationId(1);
 
@@ -98,7 +98,7 @@ public class ModifyRecommendation extends PortfolioPreferenceControllerTest {
 
     @Test
     public void throwsIfRecommendationIdIsNull() {
-        portfolio.setId(1);
+        portfolio.setId("1");
         portfolio.setCustomerId("abc");
         recommendation.setRecommendationId(null);
         try{
@@ -116,10 +116,10 @@ public class ModifyRecommendation extends PortfolioPreferenceControllerTest {
 
     @Test
     public void throwsIfPortfolioIdDoesNotExist(){
-        portfolio.setId(1);
+        portfolio.setId("1");
         portfolio.setCustomerId("abc");
-        recommendation.setPortfolioId(1);
-        portfolioPreference.setPortfolioId(1);
+        recommendation.setPortfolioId("1");
+        portfolioPreference.setPortfolioId("1");
 
         when(portfolioRepositoryService.findPreferenceByPortfolioId(portfolio.getId())).thenReturn(portfolioPreference);
         when(fundSystemRequestService.getPortfolios(portfolio.getCustomerId())).thenReturn(Collections.emptyList());
@@ -141,7 +141,7 @@ public class ModifyRecommendation extends PortfolioPreferenceControllerTest {
 
     @Test//(expectedExceptions = ResourceNotFoundException.class)
     public void throwsIfPortfolioPreferenceDoesNotExist() {
-        portfolio.setId(1);
+        portfolio.setId("1");
         portfolio.setCustomerId("abc");
 
         when(portfolioRepositoryService.findPreferenceByPortfolioId(portfolio.getId())).thenReturn(null);
@@ -161,10 +161,10 @@ public class ModifyRecommendation extends PortfolioPreferenceControllerTest {
 
     @Test
     public void throwsIfRecommendationDoesNotExist() {
-        portfolio.setId(1);
+        portfolio.setId("1");
         portfolio.setCustomerId("abc");
-        recommendation.setPortfolioId(1);
-        portfolioPreference.setPortfolioId(1);
+        recommendation.setPortfolioId("1");
+        portfolioPreference.setPortfolioId("1");
 
         when(portfolioRepositoryService.findPreferenceByPortfolioId(portfolio.getId())).thenReturn(portfolioPreference);
         when(recommendationRepositoryService.findRecommendationByRecommendationId(recommendation.getRecommendationId()))
@@ -185,7 +185,7 @@ public class ModifyRecommendation extends PortfolioPreferenceControllerTest {
 
     @Test
     public void normalRequest() {
-        portfolio.setId(1);
+        portfolio.setId("1");
         portfolio.setCustomerId("abc");
         fund.setFundId(1);
         fund.setFundName("stock");
@@ -193,8 +193,8 @@ public class ModifyRecommendation extends PortfolioPreferenceControllerTest {
         holding.setFundId(1);
         holding.setUnits(50);
         portfolio.setHoldings(new ArrayList<Holding>(){{add(holding);}});
-        recommendation.setPortfolioId(1);
-        portfolioPreference.setPortfolioId(1);
+        recommendation.setPortfolioId("1");
+        portfolioPreference.setPortfolioId("1");
         recommendation.setRecommendationId(1);
         Recommendation recommendation2 = new Recommendation();
         recommendation.setRecommendationId(1);

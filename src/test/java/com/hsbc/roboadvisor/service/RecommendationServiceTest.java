@@ -37,14 +37,14 @@ public class RecommendationServiceTest {
     private Holding holding1 = new Holding(9123, 100, new CurrencyAmount(new BigDecimal(500), Currency.CAD));
     private Holding holding2 = new Holding(9124, 150, new CurrencyAmount(new BigDecimal(1500), Currency.CAD));
     private List<Holding> holdings = new ArrayList<Holding>(){{add(holding1); add(holding2);}};
-    private Portfolio portfolio = new Portfolio("abcde", 12345, holdings);
+    private Portfolio portfolio = new Portfolio("abcde", "12345", holdings);
     //private List<Portfolio> portfolios  = new ArrayList<>();
 
     private Allocation allocation1 = new Allocation(9123, 1, new BigDecimal(50));
     private Allocation allocation2 = new Allocation(9124, 1, new BigDecimal(50));
     private List<Allocation> allocations = new ArrayList<Allocation>(){{add(allocation1); add(allocation2);}};;
 
-    private PortfolioPreference portfolioPreference = new PortfolioPreference(12345, 5, PortfolioType.fund, allocations);
+    private PortfolioPreference portfolioPreference = new PortfolioPreference("12345", 5, PortfolioType.fund, allocations);
 
 
     private Fund fund1 = new Fund(null, 9123, null, 1,
@@ -108,26 +108,22 @@ public class RecommendationServiceTest {
 
         Recommendation recommendation = recommendationRepositoryService.saveRecommendation(portfolio, funds, portfolioPreference);
         Assert.assertEquals(recommendation.getPortfolioId(), portfolio.getId());
-        System.out.println("porfolio info:" + new JpaJsonConverter().convertToDatabaseColumn(portfolio) + "\n");
-        System.out.println("porfolioPreference info:" + new JpaJsonConverter().convertToDatabaseColumn(portfolioPreference)+ "\n");
-        System.out.println("funds info:" + new JpaJsonConverter().convertToDatabaseColumn(funds)+ "\n");
-        System.out.println("recommendation info:" + new JpaJsonConverter().convertToDatabaseColumn(recommendation));
         Assert.assertEquals(recommendation.getTransactions().size(), 3);
 
         Transaction transaction1 = recommendation.getTransactions().get(0);
         Assert.assertEquals(transaction1.getFundId(), fund1.getFundId());
         Assert.assertEquals(transaction1.getAction(), TransactionType.buy);
-        Assert.assertEquals((int)transaction1.getUnits(), 100);
+        Assert.assertEquals((int)transaction1.getUnits(), 164);
 
         Transaction transaction2 = recommendation.getTransactions().get(1);
         Assert.assertEquals(transaction2.getFundId(), fund2.getFundId());
         Assert.assertEquals(transaction2.getAction(), TransactionType.sell);
-        Assert.assertEquals((int)transaction2.getUnits(), 50);
+        Assert.assertEquals((int)transaction2.getUnits(), 14);
 
         Transaction transaction3 = recommendation.getTransactions().get(2);
-        Assert.assertEquals(transaction3.getFundId(), fund2.getFundId());
+        Assert.assertEquals(transaction3.getFundId(), fund3.getFundId());
         Assert.assertEquals(transaction3.getAction(), TransactionType.sell);
-        Assert.assertEquals((int)transaction3.getUnits(), 50);
+        Assert.assertEquals((int)transaction3.getUnits(), 340);
     }
 
 
