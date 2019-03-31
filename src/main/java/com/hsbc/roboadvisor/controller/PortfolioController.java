@@ -397,8 +397,9 @@ public class PortfolioController {
             throw new ResourceNotFoundException("Recommendation", "Recommendation Id", recommendationId);
         }
 
-       checkAllValidFundsInRecommendation(transactionList, customerId, portfolioId);
-
+        if (portfolioPreference.getPortfolioType().equals(PortfolioType.fund)) {
+            checkAllValidFundsInRecommendation(transactionList, customerId, portfolioId);
+        }
 
         Recommendation result = this.recommendationRepositoryService.updateRecommendationTransactions(
                 recommendation, transactionList);
@@ -417,7 +418,7 @@ public class PortfolioController {
 
    private void checkAllValidFundsInRecommendation(List<Transaction> transactions, String customerId, String portfolioId) {
        List<Portfolio> customerPortfolioList = fundSystemRequestService.getPortfolios(customerId);
-       List<Holding> portfolioFunds = customerPortfolioOrFail(customerPortfolioList,portfolioId).getHoldings();
+       List<Holding> portfolioFunds = customerPortfolioOrFail(customerPortfolioList, portfolioId).getHoldings();
 
        Map<Integer, Boolean> mapPortfolioFunds = portfolioFundstoMap(portfolioFunds);
        for (Transaction transaction : transactions) {

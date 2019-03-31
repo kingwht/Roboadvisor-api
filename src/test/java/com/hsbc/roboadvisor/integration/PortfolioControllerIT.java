@@ -233,7 +233,6 @@ public class PortfolioControllerIT
 		ResponseEntity<String> entity = this.restTemplate.exchange(createURLWithPort("/roboadvisor/portfolio/9795213/rebalance"), HttpMethod.POST, new HttpEntity<>(headers), String.class);
 		Assert.assertEquals(entity.getStatusCode(), HttpStatus.OK);
 
-
 		JSONArray transactions = pullOutRecommendationTransacations(entity);
 		int recommendID = pullOutRecommendationID(entity);
 		Assert.assertNotEquals(recommendID, 0);
