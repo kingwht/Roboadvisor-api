@@ -26,3 +26,11 @@ Ensure docker is running with MySQL and Adminer containers running using the dev
 
 ## Swagger Docs
 Once the service/jar is running, the swagger docs can be reached locally at  `localhost:5000/swagger-ui.html`
+
+## SonarQube
+Sonarqube static code analysis is enabled for this project.
+To run scan locally, ensure that the necessary Docker services are running in dev-tools.
+If you have not obtained a Sonarqube user token, please access `localhost:9000` and create a user. You will be provided a user token.
+
+Sonarqube scanning can be initiated by running this command:
+`mvn sonar:sonar -Dsonar.projectKey=roboadvisor-api -Dsonar.host.url=http://localhost:9000 -Dsonar.login=<user token>`
