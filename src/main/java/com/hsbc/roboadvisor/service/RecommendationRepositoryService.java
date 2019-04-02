@@ -87,6 +87,8 @@ public class RecommendationRepositoryService
             }else if ( units < 0 ) {
                 int amount = abs(units) > fundUnitCountMap.get(key)? fundUnitCountMap.get(key) : abs(units);
                 transactions.add(new Transaction(TransactionType.sell, key, amount));
+            }else {
+                transactions.add(new Transaction(TransactionType.buy, key, 0));
             }
         }
 
