@@ -35,7 +35,7 @@ integration_test:
     - merge_requests
     - master
 
-production:
+deployment:
   stage: deploy
   script:
     - wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-218.0.0-linux-x86.tar.gz
@@ -44,7 +44,7 @@ production:
     - echo $DEPLOY_KEY_FILE_PRODUCTION > /tmp/$CI_PIPELINE_ID.json
     - ./google-cloud-sdk/bin/gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
     - source /builds/cpsc319-2018w2/hsbc/formation/roboadvisor-api/google-cloud-sdk/path.bash.inc
-    - ./google-cloud-sdk/bin/gcloud config set project hsbc-roboadvisor
+    - ./google-cloud-sdk/bin/gcloud config set project $PROJECT_ID
     - mvn appengine:deploy -Pcloud
   retry: 2
   only:
