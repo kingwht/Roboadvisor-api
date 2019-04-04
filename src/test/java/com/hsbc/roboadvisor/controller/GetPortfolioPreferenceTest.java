@@ -44,9 +44,9 @@ public class GetPortfolioPreferenceTest extends PortfolioPreferenceControllerTes
     }
 
     @Test
-    public void MissingHeader() {
+    public void missingHeader() {
         try{
-            mockMvc.perform(MockMvcRequestBuilders.post("/roboadvisor/portfolio/" + PID1))
+            mockMvc.perform(MockMvcRequestBuilders.get("/roboadvisor/portfolio/" + PID1))
                     .andExpect(MockMvcResultMatchers.status().isBadRequest());
         } catch (Exception e) {
             if(e.getClass() != MissingRequestHeaderException.class)
