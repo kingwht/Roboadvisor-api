@@ -1,39 +1,7 @@
 image: jamesdbloom/docker-java8-maven:latest
 
 stages:
-  - compile
-  - unit_test
-  - integration_test
   - deploy
-
-build:
-  stage: compile
-  script:
-    - mvn clean compile
-  only:
-    - merge_requests
-    - master
-    
-unit_test:
-  stage: unit_test
-  script:
-    - mvn clean test
-  only:
-    - merge_requests
-    - master
-    
-integration_test:
-  services:
-    - mysql:latest
-  variables:
-    MYSQL_DATABASE: roboadvisor
-    MYSQL_ROOT_PASSWORD: roboadvisor
-  stage: integration_test
-  script: 
-    - mvn clean -DskipSurefire integration-test -Ptest
-  only:
-    - merge_requests
-    - master
 
 deployment:
   stage: deploy
@@ -43,9 +11,7 @@ deployment:
     - ./google-cloud-sdk/install.sh
     - echo $DEPLOY_KEY_FILE_PRODUCTION > /tmp/$CI_PIPELINE_ID.json
     - ./google-cloud-sdk/bin/gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
-    - source /builds/cpsc319-2018w2/hsbc/formation/roboadvisor-api/google-cloud-sdk/path.bash.inc
+    - ls $CI_PROJECT_DIR
+    - source $CI_PROJECT_DIR/google-cloud-sdk/path.bash.inc
     - ./google-cloud-sdk/bin/gcloud config set project $PROJECT_ID
-    - mvn appengine:deploy -Pcloud
-  retry: 2
-  only:
-    - master
+    #- mvn appengine:deploy -Pcloud
