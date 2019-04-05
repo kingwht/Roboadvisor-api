@@ -43,7 +43,7 @@ deployment:
     - ./google-cloud-sdk/install.sh
     - echo $DEPLOY_KEY_FILE_PRODUCTION > /tmp/$CI_PIPELINE_ID.json
     - ./google-cloud-sdk/bin/gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
-    - source /builds/cpsc319-2018w2/hsbc/formation/roboadvisor-api/google-cloud-sdk/path.bash.inc
+    - source $CI_PROJECT_DIR/google-cloud-sdk/path.bash.inc
     - ./google-cloud-sdk/bin/gcloud config set project $PROJECT_ID
     - mvn appengine:deploy -Pcloud
   retry: 2
