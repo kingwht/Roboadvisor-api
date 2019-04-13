@@ -10,6 +10,8 @@ public class Holding
 
     private CurrencyAmount balance;
 
+ //  private Integer category;
+
     public Holding() {
         //empty constructor
     }
@@ -43,4 +45,5 @@ public class Holding
     public void setBalance(CurrencyAmount balance) {
         this.balance = balance;
     }
+
 }

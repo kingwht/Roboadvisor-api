@@ -117,7 +117,6 @@ public class PortfolioControllerIT
 		String allocationChange = "[ { \"fundId\": 3, \"percentage\": 25 }]";
 		HttpEntity<String> params = new HttpEntity<String>(allocationChange, headers);
 		ResponseEntity<String> entity = this.restTemplate.exchange(createURLWithPort("/roboadvisor/portfolio/9795213/allocations") , HttpMethod.PUT,params, String.class);
-		System.out.println(entity.getBody());
 		Assert.assertEquals(entity.getStatusCode(),HttpStatus.BAD_REQUEST);
 	}
 
@@ -256,11 +255,158 @@ public class PortfolioControllerIT
 		String recommendation = "[{\"action\":\"buy\",\"fundId\": 23500,\"units\":321},{\"action\":\"sell\",\"fundId\":23503,\"units\":114}]";
 		HttpEntity<String> params = new HttpEntity<String>(recommendation, headers);
 		ResponseEntity<String> entity = this.restTemplate.exchange(createURLWithPort("/roboadvisor/portfolio/9795213/recommendation/1/modify"), HttpMethod.PUT, params, String.class);
-		System.out.println(entity.getBody());
 		Assert.assertEquals(entity.getStatusCode(), HttpStatus.OK);
 		JSONArray arrayActual = new JSONObject(entity.getBody()).optJSONArray("transactions");
 		JSONArray arrayExpected = new JSONArray(recommendation);
 		JSONAssert.assertEquals(arrayActual, arrayExpected, JSONCompareMode.STRICT);
+	}
+
+	@Test(dependsOnMethods={"testmodifyRecommendation"})
+	public void testInvalidPortfolioandCateogryMix() throws JSONException{
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("x-custid",custId);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		String portofolio = "{\n " +
+				"  \"allocations\": [" +
+				"    {\n" +
+				"      \"fundId\": 23456,\n" +
+				"      \"percentage\": 25\n" +
+				"    },\n" +
+				"    {\n" +
+				"      \"category\": 1,\n" +
+				"      \"percentage\": 50\n" +
+				"    }\n" +
+				"  ],\n" +
+				"  \"deviation\": 3,\n" +
+				"  \"type\": \"category\"\n" +
+				"}";
+		HttpEntity<String> entity = new HttpEntity<String>(portofolio, headers);
+		ResponseEntity<String> req = this.restTemplate.exchange(createURLWithPort("/roboadvisor/portfolio/9795213") , HttpMethod.POST,entity, String.class);
+		Assert.assertEquals("Only one portfolio type of Category or Fund Id can be set. Please check again.", new JSONObject(req.getBody()).optString("message"));
+		Assert.assertEquals(req.getStatusCode(), HttpStatus.BAD_REQUEST);
+	}
+
+
+
+	@Test(dependsOnMethods={"testInvalidPortfolioandCateogryMix"})
+	public void testInValidPortfolioswithDuplicateCategories() throws JSONException{
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("x-custid",custId);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		String portofolio1 = "{\n " +
+				"  \"allocations\": [" +
+				"    {\n" +
+				"      \"category\": 1,\n" +
+				"      \"percentage\": 20\n" +
+				"    },\n" +
+				"    {\n" +
+				"      \"category\": 2,\n" +
+				"      \"percentage\": 40\n" +
+				"    },\n" +
+				"    {\n" +
+				"      \"category\": 2,\n" +
+				"      \"percentage\": 40\n" +
+				"    }\n" +
+				"  ],\n" +
+				"  \"deviation\": 3,\n" +
+				"  \"type\": \"category\"\n" +
+				"}";
+		HttpEntity<String> entity = new HttpEntity<String>(portofolio1, headers);
+		ResponseEntity<String> req = this.restTemplate.exchange(createURLWithPort("/roboadvisor/portfolio/9795213") , HttpMethod.POST,entity, String.class);
+		Assert.assertEquals("Non-unique allocation entries. Please check again.", new JSONObject(req.getBody()).optString("message"));
+		Assert.assertEquals(req.getStatusCode(), HttpStatus.BAD_REQUEST);
+	}
+
+	@Test(dependsOnMethods={"testInValidPortfolioswithDuplicateCategories"})
+	public void testValidPortfolioswithCategories() throws JSONException {
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("x-custid",custId);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		String portofolio = "{\n " +
+				"  \"allocations\": [" +
+				"    {\n" +
+				"      \"category\": 3,\n" +
+				"      \"percentage\": 40\n" +
+				"    },\n" +
+				"    {\n" +
+				"      \"category\": 2,\n" +
+				"      \"percentage\": 60\n" +
+				"    }\n" +
+				"  ],\n" +
+				"  \"deviation\": 5,\n" +
+				"  \"type\": \"category\"\n" +
+				"}";
+		HttpEntity<String> entity = new HttpEntity<String>(portofolio, headers);
+		ResponseEntity<String> req = this.restTemplate.exchange(createURLWithPort("/roboadvisor/portfolio/9795213") , HttpMethod.POST,entity, String.class);
+		Assert.assertEquals(req.getStatusCode(), HttpStatus.CREATED);
+	}
+
+	@Test(dependsOnMethods={"testInValidPortfolioswithDuplicateCategories"})
+	public void testValidPortfolioswithInvalidCategory() throws JSONException {
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("x-custid",custId);
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		String portofolio = "{\n " +
+				"  \"allocations\": [" +
+				"    {\n" +
+				"      \"category\": 1,\n" +
+				"      \"percentage\": 40\n" +
+				"    },\n" +
+				"    {\n" +
+				"      \"category\": 2,\n" +
+				"      \"percentage\": 60\n" +
+				"    }\n" +
+				"  ],\n" +
+				"  \"deviation\": 5,\n" +
+				"  \"type\": \"category\"\n" +
+				"}";
+		HttpEntity<String> entity = new HttpEntity<String>(portofolio, headers);
+		ResponseEntity<String> req = this.restTemplate.exchange(createURLWithPort("/roboadvisor/portfolio/9795213") , HttpMethod.POST,entity, String.class);
+		Assert.assertEquals(req.getStatusCode(), HttpStatus.BAD_REQUEST);
+		String message = new JSONObject(req.getBody()).optString("message");
+		Assert.assertEquals("Cannot use a category that does not exist in a portfolio. Please try again.", message);
+	}
+
+
+	@Test(dependsOnMethods={"testValidPortfolioswithCategories"})
+	public void testPOSTRecommendationForCatogory() throws JSONException{
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("x-custid", custId);
+		ResponseEntity<String> entity = this.restTemplate.exchange(createURLWithPort("/roboadvisor/portfolio/9795213/rebalance"), HttpMethod.POST, new HttpEntity<>(headers), String.class);
+		Assert.assertEquals(entity.getStatusCode(), HttpStatus.OK);
+		JSONObject body = new JSONObject(entity.getBody());
+		JSONArray recommendationList  = body.optJSONArray("recommendedTransactionList");
+		System.out.println(entity.getBody());
+		Assert.assertNotEquals(entity.getBody(),null);
+		Assert.assertNotEquals(recommendationList,null);
+	}
+
+
+
+	@Test(dependsOnMethods={"testValidPortfolioswithCategories"})
+	public void testRecommendationPreferencesRanked() throws JSONException {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.set("x-custid", custId);
+		String budget = "{\"budget\":10000,\"fundCategory\":2}";
+		String rankedItems = "[{\"action\":\"buy\",\"fundId\": 23500,\"units\":47},{\"action\":\"buy\",\"fundId\":23458,\"units\":79},{\"action\":\"buy\",\"fundId\":23459,\"units\":42}]";
+		HttpEntity<String> params = new HttpEntity<String>(budget,headers);
+		ResponseEntity<String> entity = this.restTemplate.exchange(createURLWithPort("roboadvisor/portfolio/rebalance/ranking"), HttpMethod.POST, params, String.class);
+		JSONArray arrayActual = new JSONArray(entity.getBody());
+		JSONArray arrayExpected = new JSONArray(rankedItems);
+		Assert.assertEquals(entity.getStatusCode(), HttpStatus.OK);
+		JSONAssert.assertEquals(arrayActual, arrayExpected, JSONCompareMode.STRICT);
+	}
+
+	@Test(dependsOnMethods={"testRecommendationPreferencesRanked"})
+	public void testRecommendationPreferencesInvalid() throws JSONException {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.set("x-custid", custId);
+		String budget = "{\"budget\":10000,\"fundCategory\":1}";
+		HttpEntity<String> params = new HttpEntity<String>(budget,headers);
+		ResponseEntity<String> entity = this.restTemplate.exchange(createURLWithPort("roboadvisor/portfolio/rebalance/ranking"), HttpMethod.POST, params, String.class);
+		Assert.assertEquals(entity.getStatusCode(), HttpStatus.BAD_REQUEST);
 	}
 
 
@@ -323,7 +469,7 @@ public class PortfolioControllerIT
 		try {
 			recommendID = recommendations.getInt("recommendationId");
 		} catch(JSONException e){
-			Assert.fail("Invalid return JSON object, No transaction field");
+			Assert.fail("Invalid return JSON object, No recommendationId field");
 		}
 		return recommendID;
 	}

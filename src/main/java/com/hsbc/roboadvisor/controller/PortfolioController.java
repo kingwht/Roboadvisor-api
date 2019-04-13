@@ -130,6 +130,10 @@ public class PortfolioController {
             checkAllValidFundsInPortfolio(portfolioRequest.getAllocations(), customerId, portfolioId);
         }
 
+        if (portfolioRequest.getType() == PortfolioType.category){
+            checkAllValidCategories(portfolioRequest.getAllocations(), customerId, portfolioId);
+        }
+
         PortfolioPreference result = portfolioService.savePreference(portfolioId, portfolioRequest);
 
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/roboadvisor/{id}")
@@ -232,6 +236,19 @@ public class PortfolioController {
         for (Allocation allocation : allocationsList) {
             if (mapPortfolioFunds.get(allocation.getFundId()) == null) {
                 throw new BadRequestException("Cannot use a fundID that does not exist in a portfolio. Please try again.");
+            }
+        }
+    }
+
+    // Checks if all funds in a given portfolio preference are part of the customer's portfolio
+    private void checkAllValidCategories(List<Allocation> allocationsList, String customerId, String portfolioId) {
+        List<Portfolio> customerPortfolioList = fundSystemRequestService.getPortfolios(customerId);
+        List<Holding> portfolioFunds = customerPortfolioOrFail(customerPortfolioList,portfolioId).getHoldings();
+        Map<Integer, Boolean> mapPortfolioCategories = portfolioCateogriestoMap(customerId,portfolioFunds);
+
+        for (Allocation allocation : allocationsList) {
+            if (mapPortfolioCategories.get(allocation.getCategory()) == null) {
+                throw new BadRequestException("Cannot use a category that does not exist in a portfolio. Please try again.");
             }
         }
     }
@@ -413,7 +430,18 @@ public class PortfolioController {
             mapPortfolioFunds.put(fund.getFundId(), true);
         }
         return mapPortfolioFunds;
-}
+    }
+
+    private Map<Integer, Boolean> portfolioCateogriestoMap(String customerId,List<Holding> portfolioFunds){
+        Map<Integer, Boolean> mapPortfolioFunds = new HashMap<>();
+
+        for (Holding fund : portfolioFunds) {
+            mapPortfolioFunds.put(fundSystemRequestService.getFund(customerId,fund.getFundId()).getCategory(), true);
+        }
+        return mapPortfolioFunds;
+    }
+
+
 
 
    private void checkAllValidFundsInRecommendation(List<Transaction> transactions, String customerId, String portfolioId) {
