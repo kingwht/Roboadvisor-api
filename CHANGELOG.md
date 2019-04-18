@@ -2,9 +2,14 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+
+## [1.1.0] - 2019-04-18
 ### Changed
 - Replace hardcoded build path with `$CI_PROJECT_DIR` Gitlab CI pre-defined env vars. 
 - Update Integration test for Category based preference rebalancing stretch goal
+
+### Added
 - Add additional error handling for non-existant categories
 
 ## [1.0.0] - 2019-04-04
